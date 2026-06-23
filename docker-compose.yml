@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: cashpilot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cashpilot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-123456}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cashpilot-network
+
+  # CashPilot Backend (Spring Boot)
+  cashpilot-backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: cashpilot-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/cashpilot
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-123456}
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - cashpilot-network
+    profiles: ["dev"]
+
+networks:
+  cashpilot-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
