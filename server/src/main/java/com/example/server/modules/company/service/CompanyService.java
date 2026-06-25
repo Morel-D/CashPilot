@@ -25,7 +25,7 @@ public class CompanyService {
     public Company createCompanyForUser(Long userId, CompanyRequest request) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("USER_NOT_FOUND"));
 
         Company company = Company.builder()
                 .uid(System.currentTimeMillis()) 
@@ -50,11 +50,11 @@ public class CompanyService {
     @Transactional
     public Company createCompany(Long userId, CompanyRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("USER_NOT_FOUND"));
 
         // Check if user already has a company with same name
         if (companyRepository.existsByNameAndOwnerId(request.getName(), userId)) {
-            throw new IllegalArgumentException("Company with this name already exists");
+            throw new IllegalArgumentException("COMPANY_NAME_ALREADY_EXIST");
         }
 
         Company company = Company.builder()
@@ -83,7 +83,7 @@ public class CompanyService {
 
     public Company getCompanyById(Long companyId, Long userId) {
         return companyRepository.findByIdAndOwnerId(companyId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Company not found or access denied"));
+                .orElseThrow(() -> new IllegalArgumentException("COMPANY_NOT_FOUND"));
     }
 
 

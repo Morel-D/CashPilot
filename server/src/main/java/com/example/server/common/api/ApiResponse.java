@@ -27,7 +27,8 @@ public class ApiResponse<T> {
 
     // Error Response
     public static <T> ApiResponse<T> error(String message, Object errors) {
-        return new ApiResponse<>(false, null, message, errors, LocalDateTime.now());
+        String upperMessage = (message == null) ? "ERROR" : message.toUpperCase();
+        return new ApiResponse<>(false, null, upperMessage, errors, LocalDateTime.now());
     }
 
     public boolean isSuccess() {

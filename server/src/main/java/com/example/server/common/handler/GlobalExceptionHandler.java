@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         }
 
         return ResponseEntity.badRequest().body(
-            ApiResponse.error("Validation failed", errors)
+            ApiResponse.error("VALIDATION_FAILED", errors)
         );
     }
 
@@ -38,14 +38,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Object>> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-            ApiResponse.error("invalid_credentials", null)
+            ApiResponse.error("INVALID_CREDENTIALS", null)
         );
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Object>> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-            ApiResponse.error("access_denied", null)
+            ApiResponse.error("ACCESS_DENIED", null)
         );
     }
 
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleGenericError(Exception ex) {
         ex.printStackTrace();
         return ResponseEntity.internalServerError().body(
-            ApiResponse.error("An unexpected error occurred", "SERVER_ERROR")
+            ApiResponse.error("INTERNAL_SERVER_ERROR", null)
         );
     }
 }

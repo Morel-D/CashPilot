@@ -12,13 +12,24 @@ public class JwtUtil {
 
     private final String SECRET_KEY = "yourverystrongsecretkeyatleast32characterslongchangeiNproduction";
 
-    public String generateToken(String email, Long companyId) {
+    public String generateAccessToken(String email, Long companyId) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("companyId", companyId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
+
+    // Refresh Token (long lived)
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7 days
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
                 .compact();
     }
 
