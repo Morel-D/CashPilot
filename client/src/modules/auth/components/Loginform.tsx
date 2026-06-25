@@ -38,7 +38,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
+    <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-4">
 
       <Input
         label="Email address"
@@ -48,7 +48,7 @@ export function LoginForm() {
         onChange={onChange('email')}
         error={errors.email}
         leftIcon={EmailIcon}
-        required
+        showRequired
       />
 
       <Input
@@ -58,7 +58,7 @@ export function LoginForm() {
         value={form.password}
         onChange={onChange('password')}
         error={errors.password}
-        required
+        showRequired
       />
 
       <Button

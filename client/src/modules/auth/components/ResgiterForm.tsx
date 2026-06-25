@@ -174,7 +174,7 @@ export function RegisterForm() {
               onChange={onStep1Change('fullName')}
               error={errors1.fullName}
               leftIcon={UserIcon}
-              required
+              showRequired
             />
             <Input
               label="Email address"
@@ -184,7 +184,7 @@ export function RegisterForm() {
               onChange={onStep1Change('email')}
               error={errors1.email}
               leftIcon={EmailIcon}
-              required
+              showRequired
             />
             <Input
               label="Password"
@@ -193,7 +193,7 @@ export function RegisterForm() {
               value={step1.password}
               onChange={onStep1Change('password')}
               error={errors1.password}
-              required
+              showRequired
             />
             <Input
               label="Phone number"
@@ -203,7 +203,7 @@ export function RegisterForm() {
               onChange={onStep1Change('phone')}
               error={errors1.phone}
               leftIcon={PhoneIcon}
-              required
+              showRequired
             />
 
             <Button
@@ -223,7 +223,7 @@ export function RegisterForm() {
 
         {/* STEP 2 — Company info */}
         {step === 2 && (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
             <Input
               label="Company name"
               placeholder="Kora Inc."
@@ -231,7 +231,7 @@ export function RegisterForm() {
               onChange={onStep2Change('companyName')}
               error={errors2.companyName}
               leftIcon={BuildingIcon}
-              required
+              showRequired
             />
             <Select
               label="Base currency"

@@ -8,11 +8,12 @@ import {
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?:       string;
-  error?:       string;
-  hint?:        string;
-  leftIcon?:    ReactNode;
-  rightElement?: ReactNode; // e.g. show/hide password toggle
+  label?:        string;
+  error?:        string;
+  hint?:         string;
+  leftIcon?:     ReactNode;
+  rightElement?: ReactNode;
+  showRequired?: boolean; // shows * on label without triggering native validation
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -27,6 +28,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       rightElement,
       id,
       type,
+      showRequired,
       className = '',
       ...props
     },
@@ -47,7 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className="font-sans text-xs font-medium text-dark/70 select-none"
           >
             {label}
-            {props.required && (
+            {showRequired && (
               <span className="ml-0.5 text-primary" aria-hidden="true">*</span>
             )}
           </label>
@@ -67,6 +69,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             type={inputType}
+            // Never let the browser show its own validation bubbles
+            required={false}
             className={[
               'w-full h-10 rounded-lg bg-white',
               'font-sans text-sm text-dark placeholder:text-neutral-text-muted/70',
@@ -96,12 +100,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
-                    // Eye-slash
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
                     </svg>
                   ) : (
-                    // Eye
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -115,9 +117,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
 
-        {/* Error or hint */}
+        {/* Custom error — never native browser tooltip */}
         {error ? (
-          <p className="font-sans text-xs text-red-500">{error}</p>
+          <p className="flex items-center gap-1 font-sans text-xs text-red-500">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3 shrink-0">
+              <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14Zm0-10a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 5Zm0 7a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75Z" clipRule="evenodd" />
+            </svg>
+            {error}
+          </p>
         ) : hint ? (
           <p className="font-sans text-xs text-neutral-text-muted">{hint}</p>
         ) : null}
