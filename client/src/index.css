@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Design Tokens (Tailwind v4 @theme) ───────────────────────────────────*/
+@theme {
+
+  /* Colors */
+  --color-primary:           #6F84FF;
+  --color-primary-50:        #F0F2FF;
+  --color-primary-100:       #E3E7FF;
+  --color-primary-200:       #C7CFFF;
+  --color-primary-300:       #A3B0FF;
+  --color-primary-400:       #8898FF;
+  --color-primary-500:       #6F84FF;
+  --color-primary-600:       #4D64FF;
+  --color-primary-700:       #3A52E0;
+  --color-primary-800:       #2A3DB5;
+  --color-primary-900:       #1E2D8A;
+
+  --color-dark:              #020526;
+  --color-dark-50:           #E8E9F0;
+  --color-dark-100:          #C5C7D9;
+  --color-dark-200:          #9499BB;
+  --color-dark-300:          #636B9D;
+  --color-dark-400:          #3D4680;
+  --color-dark-500:          #020526;
+
+  --color-neutral-white:     #FFFFFF;
+  --color-neutral-bg-soft:   #F7F8FA;
+  --color-neutral-text-muted:#9A9B9E;
+
+  /* Fonts */
+  --font-display:            "Sora", sans-serif;
+  --font-sans:               "Inter", sans-serif;
+  --font-mono:               "JetBrains Mono", monospace;
+
+  /* Font sizes */
+  --text-2xs:                0.625rem;
+  --text-2xs--line-height:   1rem;
+
+  /* Shadows */
+  --shadow-card:             0 1px 4px 0 rgba(2, 5, 38, 0.06);
+  --shadow-card-hover:       0 4px 16px 0 rgba(2, 5, 38, 0.10);
+  --shadow-primary:          0 4px 14px 0 rgba(111, 132, 255, 0.30);
+
+  /* Border radius */
+  --radius-sm:               6px;
+  --radius-md:               10px;
+  --radius-lg:               12px;
+  --radius-xl:               16px;
+  --radius-2xl:              20px;
+}
+
+/* ─── Base resets ───────────────────────────────────────────────────────────*/
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-neutral-bg-soft font-sans text-dark text-base;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-light text-dark;
+  }
+
+  p {
+    @apply text-neutral-text-muted;
+  }
+}
+
+/* ─── Component shortcuts ───────────────────────────────────────────────────*/
+@layer components {
+
+  /* Primary button */
+  .btn-primary {
+    @apply bg-primary text-white font-semibold text-sm px-5 py-2.5 rounded-lg
+           shadow-primary hover:bg-primary-600 active:bg-primary-700
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Dark button */
+  .btn-dark {
+    @apply bg-dark text-white font-semibold text-sm px-5 py-2.5 rounded-lg
+           hover:bg-dark-400 active:bg-dark-500
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Ghost / outline button */
+  .btn-ghost {
+    @apply bg-transparent border border-dark/20 text-dark font-semibold text-sm
+           px-5 py-2.5 rounded-lg hover:bg-dark/5
+           transition-colors duration-150;
+  }
+
+  /* Card surface */
+  .card {
+    @apply bg-white rounded-xl shadow-card p-6;
+  }
+
+  /* Info / data display zone */
+  .info-zone {
+    @apply bg-neutral-bg-soft rounded-lg p-4;
+  }
+
+  /* Muted label above a value */
+  .field-label {
+    @apply font-sans text-xs font-medium text-neutral-text-muted uppercase tracking-wide;
+  }
+
+  /* Numeric / monetary value */
+  .amount {
+    @apply font-mono font-medium text-dark;
+  }
+}
