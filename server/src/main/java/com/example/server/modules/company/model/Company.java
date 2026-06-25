@@ -2,6 +2,8 @@ package com.example.server.modules.company.model;
 
 import java.time.LocalDateTime;
 
+import com.example.server.modules.auth.model.User;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,4 +42,10 @@ public class Company {
     @Builder.Default
     @Column(nullable = false)
     private String status = "true";
+
+
+    // === Multi-Tenancy Relationship ===
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 }
