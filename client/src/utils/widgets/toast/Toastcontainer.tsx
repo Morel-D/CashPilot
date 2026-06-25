@@ -1,6 +1,6 @@
 
 import Toast from './Toast';
-import { useToastStore } from './ToastStore';
+import { useToastStore } from './Toaststore';
 
 export function ToastContainer() {
   const { toasts, hide } = useToastStore();
