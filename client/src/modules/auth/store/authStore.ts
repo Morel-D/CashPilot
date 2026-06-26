@@ -1,49 +1,53 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export interface AuthCompany {
+  id:          number;
+  uid:         number;
+  name:        string;
+  currency:    string;
+  description: string | null;
+  notice:      string | null;
+  status:      string;
+  dateOf:      string;
+  updateOf:    string;
+}
+
 export interface AuthUser {
-  email:     string;
-  fullName:  string;
-  companyId: number;
+  email:    string;
+  fullName: string;
+  company:  AuthCompany;
 }
 
 interface AuthState {
-  accessToken:    string | null;
-  refreshToken:   string | null;
-  user:           AuthUser | null;
+  accessToken: string | null;
+  user:        AuthUser | null;
 
-  setAuth:        (tokens: { accessToken: string; refreshToken: string }, user: AuthUser) => void;
   setAccessToken: (token: string) => void;
+  setUser:        (user: AuthUser) => void;
   clearAuth:      () => void;
 }
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const AT_KEY = 'cashpilot_at';
+
 // ─── Store ────────────────────────────────────────────────────────────────────
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      accessToken:  null,
-      refreshToken: null,
-      user:         null,
+export const useAuthStore = create<AuthState>()((set) => ({
+  accessToken: localStorage.getItem(AT_KEY),
+  user:        null,
 
-      setAuth: ({ accessToken, refreshToken }, user) =>
-        set({ accessToken, refreshToken, user }),
+  setAccessToken: (token) => {
+    localStorage.setItem(AT_KEY, token);
+    set({ accessToken: token });
+  },
 
-      setAccessToken: (accessToken) =>
-        set({ accessToken }),
+  setUser: (user) => set({ user }),
 
-      clearAuth: () =>
-        set({ accessToken: null, refreshToken: null, user: null }),
-    }),
-    {
-      name: "cashpilot_auth",
-      partialize: (state) => ({
-        accessToken:  state.accessToken,
-        refreshToken: state.refreshToken,
-        user:         state.user,
-      }),
-    }
-  )
-);
+  clearAuth: () => {
+    localStorage.removeItem(AT_KEY);
+    set({ accessToken: null, user: null });
+  },
+}));

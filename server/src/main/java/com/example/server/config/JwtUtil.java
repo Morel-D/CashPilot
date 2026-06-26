@@ -17,7 +17,7 @@ public class JwtUtil {
                 .setSubject(email)
                 .claim("companyId", companyId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 30)) // 30 days
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
@@ -31,6 +31,16 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7 days
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
                 .compact();
+    }
+
+
+    // ==================== VALIDATION METHODS ====================
+    public boolean isAccessTokenValid(String token) {
+        return validateToken(token);
+    }
+
+    public boolean isRefreshTokenValid(String token) {
+        return validateToken(token);
     }
 
 

@@ -1,4 +1,9 @@
 import type { ApiResponse } from '../../utils/Axios';
+import type { AuthUser, AuthCompany } from './store/authStore';
+
+// ─── Re-export for convenience ────────────────────────────────────────────────
+
+export type { AuthUser, AuthCompany };
 
 // ─── Requests ─────────────────────────────────────────────────────────────────
 
@@ -16,26 +21,19 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface RefreshRequest {
-  refreshToken: string;
-}
+// ─── Response payloads ────────────────────────────────────────────────────────
 
-// ─── Auth data payload (inside ApiResponse.data) ──────────────────────────────
-
-export interface AuthData {
+export interface AuthTokenData {
   accessToken:  string;
   refreshToken: string;
-  email:        string;
-  companyId:    number;
-  fullName:     string;
 }
 
 // ─── Full typed API responses ─────────────────────────────────────────────────
 
-export type AuthResponse    = ApiResponse<AuthData>;
-export type RefreshResponse = ApiResponse<{ accessToken: string }>;
+export type AuthResponse    = ApiResponse<AuthTokenData>;
+export type MeResponse      = ApiResponse<AuthUser>;
 
-// ─── Register form — split into 2 steps ──────────────────────────────────────
+// ─── Register form steps ──────────────────────────────────────────────────────
 
 export interface RegisterStep1 {
   fullName: string;

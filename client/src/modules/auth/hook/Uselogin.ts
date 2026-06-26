@@ -1,36 +1,48 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authApi } from '../api/AuthTypes';
 import { useAuthStore } from '../store/authStore';
-import { toastFromResponse, toastError } from '../../../utils/widgets/toast/Toaststore';
 import type { LoginRequest } from '../AuthTypes';
+import { toastError, toastFromResponse } from '../../../utils/widgets/toast/Toaststore';
+import { authApi } from '../api/Authapi';
 
 export function useLogin() {
-  const [loading, setLoading] = useState(false);
-  const { setAuth }           = useAuthStore();
-  const navigate              = useNavigate();
+  const [loading, setLoading]       = useState(false);
+  const { setAccessToken, setUser, clearAuth } = useAuthStore();
+  const navigate                    = useNavigate();
 
   async function login(body: LoginRequest) {
     setLoading(true);
     try {
+      // 1 — Login → get accessToken
       const res  = await authApi.login(body);
-        console.log('RAW RES:', res);
-        console.log('RAW RES.data:', res.data);
       const data = res.data;
-      toastFromResponse({
-        success:   data.success,
-        message:   data.message,
-        timestamp: data.timestamp,
-      });
 
-      if (data.success && data.data) {
-        const { accessToken, refreshToken, email, companyId, fullName } = data.data;
-        setAuth({ accessToken, refreshToken }, { email, companyId, fullName });
-        navigate('/');
+      if (!data.success || !data.data?.accessToken) {
+        toastFromResponse({ success: false, message: data.message, timestamp: data.timestamp });
+        return;
       }
+
+      // 2 — Store accessToken (interceptor will attach it to next request)
+      setAccessToken(data.data.accessToken);
+
+      // 3 — Fetch user info via GET /api/auth/refresh
+      const meRes  = await authApi.me();
+      const meData = meRes.data;
+
+      if (!meData.success || !meData.data) {
+        toastFromResponse({ success: false, message: meData.message, timestamp: meData.timestamp });
+        clearAuth();
+        return;
+      }
+
+      setUser(meData.data);
+      toastFromResponse({ success: true, message: data.message, timestamp: data.timestamp });
+      navigate('/');
+
     } catch (err: unknown) {
       const e = err as Error & { correlationId?: string };
       toastError(e.message ?? 'Login failed.', e.correlationId);
+      clearAuth();
     } finally {
       setLoading(false);
     }

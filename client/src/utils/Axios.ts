@@ -40,6 +40,35 @@ const apiClient = axios.create({
   timeout: 60_000,
 });
 
+// ─── Dev logger — comment/uncomment the block below to toggle ─────────────────
+/*
+apiClient.interceptors.request.use((config) => {
+  console.group(`[API] ▶ ${config.method?.toUpperCase()} ${config.url}`);
+  if (config.params) console.log('Params  :', config.params);
+  if (config.data)   console.log('Body    :', typeof config.data === 'string' ? JSON.parse(config.data) : config.data);
+  console.log('Headers :', config.headers);
+  console.groupEnd();
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => {
+    console.group(`[API] ✅ ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    console.log('Data    :', response.data);
+    console.groupEnd();
+    return response;
+  },
+  (err) => {
+    console.group(`[API] ❌ ${err.response?.status ?? 'ERR'} ${err.config?.method?.toUpperCase()} ${err.config?.url}`);
+    console.log('Message :', err.response?.data?.message ?? err.message);
+    console.log('Response:', err.response?.data);
+    console.groupEnd();
+    return Promise.reject(err);
+  }
+);
+*/
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── Request interceptor — inject access token ────────────────────────────────
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -49,46 +78,6 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   }
   return config;
 });
-
-// ─── Refresh logic ────────────────────────────────────────────────────────────
-
-let isRefreshing        = false;
-let refreshQueue: Array<(token: string) => void> = [];
-
-function processQueue(newToken: string) {
-  refreshQueue.forEach((resolve) => resolve(newToken));
-  refreshQueue = [];
-}
-
-async function silentRefresh(): Promise<string> {
-  const { refreshToken, setAccessToken, clearAuth } = getStore();
-
-  if (!refreshToken) {
-    clearAuth();
-    window.location.href = "/login";
-    return Promise.reject(new Error("NO_REFRESH_TOKEN"));
-  }
-
-  try {
-    const res = await axios.post<ApiResponse<{ accessToken: string }>>(
-      `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"}/api/auth/refresh`,
-      { refreshToken }
-    );
-
-    const newAccessToken = res.data.data?.accessToken;
-
-    if (!res.data.success || !newAccessToken) {
-      throw new Error(res.data.message ?? "REFRESH_FAILED");
-    }
-
-    setAccessToken(newAccessToken);
-    return newAccessToken;
-  } catch {
-    clearAuth();
-    window.location.href = "/login";
-    return Promise.reject(new Error("REFRESH_FAILED"));
-  }
-}
 
 // ─── Response interceptor ─────────────────────────────────────────────────────
 
@@ -100,50 +89,17 @@ apiClient.interceptors.response.use(
     }
     return response;
   },
-  async (err) => {
-    const originalRequest = err.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
-
-    const isAuthEndpoint = originalRequest?.url?.includes("/api/auth/");
+  (err) => {
+    const isAuthEndpoint = err.config?.url?.includes("/api/auth/");
     const status         = err.response?.status as number | undefined;
     const message        = (err.response?.data as ApiResponse)?.message ?? err.message ?? "Unknown error";
 
-    // ── 401 on a protected route → try silent refresh ──────────────────────
-    if (status === 401 && !isAuthEndpoint && !originalRequest._retry) {
-      if (isRefreshing) {
-        // Queue the request until the ongoing refresh finishes
-        return new Promise((resolve) => {
-          refreshQueue.push((token: string) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(apiClient(originalRequest));
-          });
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        const newToken = await silentRefresh();
-        processQueue(newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return apiClient(originalRequest);
-      } finally {
-        isRefreshing = false;
-      }
-    }
-
-    // ── Refresh token itself is expired ────────────────────────────────────
-    if (
-      message === "REFRESH_TOKEN_EXPIRED" ||
-      message === "token_error"
-    ) {
+    // 401 on a protected route → token invalid or expired → logout
+    if (status === 401 && !isAuthEndpoint) {
       getStore().clearAuth();
       window.location.href = "/login";
     }
 
-    // ── Attach correlationId to the error ──────────────────────────────────
     const correlationId = extractCorrelationId(err.response);
     const error = new Error(message) as Error & { correlationId?: string };
     error.correlationId = correlationId;

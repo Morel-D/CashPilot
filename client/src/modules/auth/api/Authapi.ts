@@ -1,11 +1,7 @@
+
 import apiClient from '../../../utils/Axios';
-import type {
-  LoginRequest,
-  RegisterRequest,
-  RefreshRequest,
-  AuthResponse,
-  RefreshResponse,
-} from '../AuthTypes';
+import type { AuthResponse, LoginRequest, MeResponse, RegisterRequest } from '../AuthTypes';
+
 
 export const authApi = {
   register: (body: RegisterRequest) =>
@@ -14,6 +10,7 @@ export const authApi = {
   login: (body: LoginRequest) =>
     apiClient.post<AuthResponse>('/api/auth/login', body),
 
-  refresh: (body: RefreshRequest) =>
-    apiClient.post<RefreshResponse>('/api/auth/refresh', body),
+  // GET — uses Authorization header (accessToken injected by interceptor)
+  me: () =>
+    apiClient.get<MeResponse>('/api/auth/refresh'),
 };

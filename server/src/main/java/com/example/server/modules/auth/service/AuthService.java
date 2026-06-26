@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.server.config.JwtUtil;
+import com.example.server.modules.auth.dto.AuthRefreshResponse;
 import com.example.server.modules.auth.dto.AuthResponse;
 import com.example.server.modules.auth.dto.LoginRequest;
 import com.example.server.modules.auth.dto.RegisterRequest;
@@ -14,10 +15,9 @@ import com.example.server.modules.auth.model.User;
 import com.example.server.modules.auth.repository.RefreshTokenRepository;
 import com.example.server.modules.auth.repository.UserRepository;
 import com.example.server.modules.company.dto.CompanyRequest;
+import com.example.server.modules.company.dto.CompanyResponse;
 import com.example.server.modules.company.model.Company;
 import com.example.server.modules.company.service.CompanyService;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -68,7 +68,7 @@ public class AuthService {
 
         refreshTokenRepository.save(refreshToken);
 
-        return new AuthResponse(accessToken, refreshTokenStr, user.getEmail(), company.getId(), user.getFullName());
+        return new AuthResponse(accessToken, refreshTokenStr);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -98,53 +98,43 @@ public class AuthService {
 
         refreshTokenRepository.save(refreshToken);
 
-        return new AuthResponse(accessToken, refreshTokenStr, user.getEmail(), companyId, user.getFullName());
+        return new AuthResponse(accessToken, refreshTokenStr);
     }
 
-    @Transactional
-    public AuthResponse refreshToken(String refreshTokenStr) {
+    public AuthRefreshResponse refreshToken(String accessToken) {
 
-        // Find refresh token
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenStr)
-                .orElseThrow(() -> new IllegalArgumentException("INVALID_REFRESH_TOKEN"));
-
-        // Check if expired or revoked
-        if (refreshToken.isExpired() || refreshToken.isRevoked()) {
-            throw new IllegalArgumentException("REFRESH_TOKEN_EXPIRED");
+        if (!jwtUtil.validateToken(accessToken)) {
+                throw new IllegalArgumentException("Invalid or expired token");
         }
 
-        User user = refreshToken.getUser();
+        String email = jwtUtil.extractEmail(accessToken);
+        Long companyId = jwtUtil.extractCompanyId(accessToken);
 
-        // Get user's current/first company
-        Company company = user.getCompanies().stream().findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("NO_COMANY_FOUND"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Generate new Access Token
-        String newAccessToken = jwtUtil.generateAccessToken(user.getEmail(), company.getId());
+        // Get company and convert to response DTO
+        Company company = user.getCompanies().stream()
+                .filter(c -> c.getId().equals(companyId))
+                .findFirst()
+                .orElseGet(() -> user.getCompanies().get(0));
 
-        // Optional: Generate new Refresh Token (Refresh Token Rotation - more secure)
-        String newRefreshToken = jwtUtil.generateRefreshToken(user.getEmail());
-
-        // Revoke old refresh token
-        refreshToken.setRevoked(true);
-        refreshTokenRepository.save(refreshToken);
-
-        // Save new refresh token
-        RefreshToken newRefreshTokenEntity = RefreshToken.builder()
-                .token(newRefreshToken)
-                .user(user)
-                .expiryDate(LocalDateTime.now().plusDays(7))
-                .build();
-
-        refreshTokenRepository.save(newRefreshTokenEntity);
-
-        return new AuthResponse(
-                newAccessToken, 
-                newRefreshToken, 
-                user.getEmail(), 
-                company.getId(), 
-                user.getFullName()
+        CompanyResponse companyResponse = new CompanyResponse(
+                company.getId(),
+                company.getUid(),
+                company.getName(),
+                company.getCurrency(),
+                company.getDescription(),
+                company.getNotice(),
+                company.getStatus(),
+                company.getDateOf(),
+                company.getUpdateOf()
         );
-    }
 
+        return new AuthRefreshResponse(
+                user.getEmail(),
+                user.getFullName(),
+                companyResponse
+        );
+        }
 }

@@ -55,29 +55,21 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: 'h-12 px-6   text-base gap-2.5',
 };
 
-// ─── Spinner ──────────────────────────────────────────────────────────────────
+// ─── Button loader — pulsing dots ────────────────────────────────────────────
 
-function Spinner({ size }: { size: ButtonSize }) {
-  const dim = size === 'sm' ? 'size-3' : size === 'md' ? 'size-4' : 'size-5';
+function ButtonLoader({ size }: { size: ButtonSize }) {
+  const dotDim = size === 'sm' ? 'size-1' : 'size-1.5';
+  const gap    = size === 'sm' ? 'gap-0.5' : 'gap-1';
   return (
-    <svg
-      className={`${dim} animate-spin`}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <circle
-        className="opacity-25"
-        cx="12" cy="12" r="10"
-        stroke="currentColor" strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-      />
-    </svg>
+    <div className={`flex items-center ${gap}`} aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className={`${dotDim} rounded-full bg-current animate-pulse`}
+          style={{ animationDelay: `${i * 150}ms`, animationDuration: '900ms' }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -121,7 +113,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           .join(' ')}
         {...props}
       >
-        {/* {loading && <Spinner size={size} />} */}
+        {loading && <ButtonLoader size={size} />}
         {children}
       </button>
     );

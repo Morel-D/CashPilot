@@ -1,17 +1,39 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "../modules/auth/store/authStore";
+import { authApi } from "../modules/auth/api/Authapi";
+import { Loader } from "../components/ui/Loader";
 
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { accessToken, user } = useAuthStore();
+  const { accessToken, user, setUser, clearAuth } = useAuthStore();
 
-  // No token at all → send to login
+  // On page reload: accessToken is in memory from localStorage,
+  // but user is null (memory only) — need to rehydrate
+  const [checking, setChecking] = useState(!!accessToken && !user);
+
+  useEffect(() => {
+    if (!accessToken || user) return;
+
+    // Token exists but no user in memory → validate token + fetch user
+    authApi.me()
+      .then((res) => {
+        const body = res.data;
+        if (body.success && body.data) {
+          setUser(body.data);
+        } else {
+          clearAuth();
+        }
+      })
+      .catch(() => clearAuth())
+      .finally(() => setChecking(false));
+  }, []);
+
+  // No token at all → login
   if (!accessToken) return <Navigate to="/login" replace />;
 
-  // Token present but user not hydrated yet (edge case on first paint)
-  // Zustand's persist middleware is synchronous, so this is almost never hit —
-  // but it's a safe guard in case the store hasn't rehydrated yet.
-  if (!user) return <Navigate to="/login" replace />;
+  // Token exists, waiting for user rehydration
+  if (checking) return <Loader fullScreen />;
 
   return <>{children}</>;
 }
