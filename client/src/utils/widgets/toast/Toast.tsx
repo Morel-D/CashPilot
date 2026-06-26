@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { formatMessage } from '../../Toastmessages';
 
 export interface ToastProps {
   id:             string;
@@ -18,17 +19,6 @@ function formatTime(iso: string): string {
   } catch { return ''; }
 }
 
-function formatMessage(msg: string): string {
-  const map: Record<string, string> = {
-    done:                 'Operation completed successfully.',
-    Email_already_exists: 'This email is already registered.',
-    bad_credentials:      'Incorrect email or password.',
-    token_error:          'Session expired. Please sign in again.',
-    server_error:         'An unexpected server error occurred.',
-    service_reachable:    'Service is reachable and responding.',
-  };
-  return map[msg] ?? msg.replace(/_/g, ' ');
-}
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);

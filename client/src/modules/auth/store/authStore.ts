@@ -1,17 +1,22 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { AuthUser } from "../AuthTypes";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface AuthUser {
+  email:     string;
+  fullName:  string;
+  companyId: number;
+}
 
 interface AuthState {
-  accessToken:  string | null;
-  refreshToken: string | null;
-  user:         AuthUser | null;
+  accessToken:    string | null;
+  refreshToken:   string | null;
+  user:           AuthUser | null;
 
-  // Actions
-  setAuth:      (tokens: { accessToken: string; refreshToken: string }, user: AuthUser) => void;
+  setAuth:        (tokens: { accessToken: string; refreshToken: string }, user: AuthUser) => void;
   setAccessToken: (token: string) => void;
-  clearAuth:    () => void;
+  clearAuth:      () => void;
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -26,7 +31,6 @@ export const useAuthStore = create<AuthState>()(
       setAuth: ({ accessToken, refreshToken }, user) =>
         set({ accessToken, refreshToken, user }),
 
-      // Called silently by the refresh interceptor
       setAccessToken: (accessToken) =>
         set({ accessToken }),
 
@@ -34,8 +38,7 @@ export const useAuthStore = create<AuthState>()(
         set({ accessToken: null, refreshToken: null, user: null }),
     }),
     {
-      name: "cashpilot_auth", // localStorage key
-      // Only persist tokens + user — nothing transient
+      name: "cashpilot_auth",
       partialize: (state) => ({
         accessToken:  state.accessToken,
         refreshToken: state.refreshToken,

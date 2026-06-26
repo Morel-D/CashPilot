@@ -117,7 +117,7 @@ public class AuthService {
 
         // Get user's current/first company
         Company company = user.getCompanies().stream().findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No company found"));
+                .orElseThrow(() -> new IllegalArgumentException("NO_COMANY_FOUND"));
 
         // Generate new Access Token
         String newAccessToken = jwtUtil.generateAccessToken(user.getEmail(), company.getId());

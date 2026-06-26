@@ -42,11 +42,11 @@ export function AuthLayout({
             <span className="text-primary">under control.</span>
           </p>
           <p className="font-sans text-sm text-white/40 max-w-xs leading-relaxed">
-            Track invoices, manage payments, and keep every franc accounted for — all in one place.
+            Track invoices, manage payments, and keep every franc accounted for all in one place.
           </p>
 
           {/* Stats row */}
-          <div className="flex gap-8 mt-4">
+          {/* <div className="flex gap-8 mt-4">
             {[
               { value: '99.9%', label: 'Uptime' },
               { value: '<1s',   label: 'Response time' },
@@ -57,7 +57,7 @@ export function AuthLayout({
                 <span className="font-sans text-xs text-white/40">{label}</span>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Bottom tagline */}

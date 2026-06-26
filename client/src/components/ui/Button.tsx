@@ -121,7 +121,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           .join(' ')}
         {...props}
       >
-        {loading && <Spinner size={size} />}
+        {/* {loading && <Spinner size={size} />} */}
         {children}
       </button>
     );
