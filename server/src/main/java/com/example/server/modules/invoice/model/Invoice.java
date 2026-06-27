@@ -40,6 +40,11 @@ public class Invoice {
     private String number;
 
     @Column(nullable = false)
+    private String title; 
+
+    private String description;
+
+    @Column(nullable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -51,4 +56,10 @@ public class Invoice {
 
     @Column(name = "due_at", nullable = false)
     private LocalDateTime dueAt;
+
+    @Column(name = "date_of", nullable = false)
+    private LocalDateTime dateOf;
+
+    @Column(name = "update_of", nullable = false)
+    private LocalDateTime updateOf;
 }
