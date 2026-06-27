@@ -8,7 +8,7 @@ const MESSAGE_MAP: Record<string, string> = {
   // -- Company -------------------------------------------------------------
   NO_COMPANY_FOUND:           'No company associated with this account.',
   COMPANY_NAME_ALREADY_EXIST: 'A company with this name already exists.',
-  NO_COMPANY_CONTEXT:         'No company context found. Please switch company first.',
+  NO_COMPANY_CONTEXT:         'No company found or not recognised.',
 
   // -- Token -------------------------------------------------------------
   INVALID_REFRESH_TOKEN:      'Your session is invalid. Please sign in again.',

@@ -14,6 +14,7 @@ import com.example.server.modules.invoice.dto.InvoiceRequest;
 import com.example.server.modules.invoice.dto.InvoiceResponse;
 import com.example.server.modules.invoice.model.Invoice;
 import com.example.server.modules.invoice.repository.InvoiceRepository;
+import com.example.server.modules.payment.dto.PaymentRequest;
 import com.example.server.modules.tenant.TenantContext;
 
 import jakarta.transaction.Transactional;
@@ -112,7 +113,7 @@ public class InvoiceService {
     // Mark as Paid (any status → PAID)
 
     @Transactional
-    public InvoiceResponse markAsPaid(Long invoiceId) {
+    public InvoiceResponse markAsPaid(Long invoiceId, PaymentRequest paymentRequest) {
         Long companyId = TenantContext.getCurrentCompanyId();
         Invoice invoice = getInvoiceByIdAndCompany(invoiceId, companyId);
 

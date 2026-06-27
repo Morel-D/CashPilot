@@ -14,6 +14,7 @@ import com.example.server.common.api.ApiResponse;
 import com.example.server.modules.invoice.dto.InvoiceRequest;
 import com.example.server.modules.invoice.dto.InvoiceResponse;
 import com.example.server.modules.invoice.service.InvoiceService;
+import com.example.server.modules.payment.dto.PaymentRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -71,8 +72,8 @@ public class InvoiceController {
 
     // Mark invoice as paid
     @PostMapping("/{id}/pay")
-    public ResponseEntity<ApiResponse<InvoiceResponse>> markAsPaid(@PathVariable Long id) {
-        InvoiceResponse response = invoiceService.markAsPaid(id);
+    public ResponseEntity<ApiResponse<InvoiceResponse>> markAsPaid(@PathVariable Long id, @RequestBody PaymentRequest paymentRequest) {
+        InvoiceResponse response = invoiceService.markAsPaid(id, paymentRequest);
         return ResponseEntity.ok(
             ApiResponse.success(response, "DONE")
         );
