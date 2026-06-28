@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.server.common.enums.InvoiceStatus;
+import com.example.server.common.enums.LedgerEntryType;
 import com.example.server.modules.company.model.Company;
 import com.example.server.modules.company.repository.CompanyRepository;
 import com.example.server.modules.customer.model.Customer;
@@ -14,7 +15,11 @@ import com.example.server.modules.invoice.dto.InvoiceRequest;
 import com.example.server.modules.invoice.dto.InvoiceResponse;
 import com.example.server.modules.invoice.model.Invoice;
 import com.example.server.modules.invoice.repository.InvoiceRepository;
+import com.example.server.modules.ledger.model.LedgerEntry;
+import com.example.server.modules.ledger.repository.LedgerEntryRepository;
 import com.example.server.modules.payment.dto.PaymentRequest;
+import com.example.server.modules.payment.model.Payment;
+import com.example.server.modules.payment.repository.PaymentRepository;
 import com.example.server.modules.tenant.TenantContext;
 
 import jakarta.transaction.Transactional;
@@ -27,6 +32,10 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final CompanyRepository companyRepository;
     private final CustomerRepository customerRepository;
+    private final PaymentRepository paymentRepository;
+    private final LedgerEntryRepository ledgerEntryRepository;
+
+    
 
 
 
@@ -120,13 +129,42 @@ public class InvoiceService {
         if (invoice.getStatus() == InvoiceStatus.PAID) {
             throw new IllegalArgumentException("INVOICE_PAID");
         }
+
+        Payment payment = Payment.builder()
+            .uid(System.currentTimeMillis())
+            .invoice(invoice)
+            .amount(paymentRequest.getPaidAmount())
+            .method(paymentRequest.getPaymentMethod())
+            .paidAt(LocalDateTime.now())
+            .status("true")
+            .build();
+
+        Payment savedPayment = paymentRepository.save(payment);
+
+        LedgerEntryType ledgerType = (invoice.getCustomer() == null) 
+            ? LedgerEntryType.DEBIT   // Internal / Expense
+            : LedgerEntryType.CREDIT; // Income from customer
+
+
+        LedgerEntry ledgerEntry = LedgerEntry.builder()
+            .uid(System.currentTimeMillis())
+            .company(invoice.getCompany())
+            .payment(savedPayment)
+            .type(ledgerType)
+            .description("Payment for invoice #" + invoice.getNumber())
+            .amount(paymentRequest.getPaidAmount())
+            .occurredAt(payment.getPaidAt())
+            .status("true")
+            .build();
+
+        ledgerEntryRepository.save(ledgerEntry);
         
 
         invoice.setStatus(InvoiceStatus.PAID);
         invoice.setUpdateOf(LocalDateTime.now());
+        invoiceRepository.save(invoice);
 
-        Invoice updated = invoiceRepository.save(invoice);
-        return mapToResponse(updated);
+        return mapToResponse(invoice);
     }
 
     // Cancel invoice
