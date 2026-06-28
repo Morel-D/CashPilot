@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./Protected";
 import DashboardPage from "../pages/Dashbaord";
 import AppLayout from "../pages/AppLayout";
 import CustomersPage from "../pages/Customers";
+import InvoicesPage from "../pages/Invoices";
 
 export const router = createBrowserRouter([
     // Public -------------------------------
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
                 children: [
             { index: true,          element: <DashboardPage /> },
             { path: 'customers',    element: <CustomersPage /> },
+            { path: 'invoices',     element: <InvoicesPage />   },
         ]
     },
 

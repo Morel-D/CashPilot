@@ -9,6 +9,7 @@ import com.example.server.common.enums.InvoiceStatus;
 import com.example.server.common.enums.LedgerEntryType;
 import com.example.server.modules.company.model.Company;
 import com.example.server.modules.company.repository.CompanyRepository;
+import com.example.server.modules.customer.dto.CustomerResponse;
 import com.example.server.modules.customer.model.Customer;
 import com.example.server.modules.customer.repository.CustomerRepository;
 import com.example.server.modules.invoice.dto.InvoiceRequest;
@@ -208,6 +209,22 @@ public class InvoiceService {
 
 
     private InvoiceResponse mapToResponse(Invoice invoice) {
+
+        CustomerResponse customerResponse = null;
+
+        if (invoice.getCustomer() != null) {
+        customerResponse = new CustomerResponse(
+                invoice.getCustomer().getId(),
+                invoice.getCustomer().getUid(),
+                invoice.getCustomer().getName(),
+                invoice.getCustomer().getEmail(),
+                invoice.getCustomer().getPhone(),
+                invoice.getCustomer().getStatus(),
+                invoice.getCustomer().getDateOf(),
+                invoice.getCustomer().getUpdateOf()
+        );
+    }
+
         return new InvoiceResponse(
                 invoice.getId(),
                 invoice.getUid(),
@@ -219,7 +236,8 @@ public class InvoiceService {
                 invoice.getIssuedAt(),
                 invoice.getDueAt(),
                 invoice.getDateOf(),
-                invoice.getUpdateOf()
+                invoice.getUpdateOf(),
+                customerResponse
         );
     }
 

@@ -1,3 +1,4 @@
+import type { Page } from '../../types/page';
 import type { ApiResponse } from '../../utils/Axios';
 
 // ─── Customer entity ──────────────────────────────────────────────────────────
@@ -11,18 +12,6 @@ export interface Customer {
   updatedAt?: string;
 }
 
-// ─── Spring Pageable wrapper ──────────────────────────────────────────────────
-
-export interface Page<T> {
-  content:          T[];
-  totalElements:    number;
-  totalPages:       number;
-  number:           number;
-  size:             number;
-  first:            boolean;
-  last:             boolean;
-  numberOfElements: number;
-}
 
 // ─── Requests ─────────────────────────────────────────────────────────────────
 

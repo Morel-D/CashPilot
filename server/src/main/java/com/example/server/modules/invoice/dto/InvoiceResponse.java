@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.server.common.enums.InvoiceStatus;
+import com.example.server.modules.customer.dto.CustomerResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,4 +26,5 @@ public class InvoiceResponse {
     private LocalDateTime dueAt;
     private LocalDateTime dateOf;
     private LocalDateTime updateOf;
+    private CustomerResponse customer;
 }
