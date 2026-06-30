@@ -1,4 +1,4 @@
-# CashPilot — Treasury & Cash Management Platform
+# CashPilot - Treasury & Cash Management Platform
 
 ## Overview
 
@@ -40,7 +40,7 @@ CashPilot is a modern treasury and cash management platform designed to help bus
 - Modules Completed:
   - **Auth**: Login / Register (2-step wizard: personal info → company info)
   - **Customer**: Full CRUD with paginated table and modal-based forms
-  - **Invoice**: Full lifecycle UI — create, edit, view, delete, plus status-aware actions (Issue, Send, Pay, Cancel) with guarded availability per status
+  - **Invoice**: Full lifecycle UI: create, edit, view, delete, plus status-aware actions (Issue, Send, Pay, Cancel) with guarded availability per status
   - **Transactions**: Read-only paginated ledger view with type/status filtering and detail modal
 
 **DevOps**
@@ -114,7 +114,7 @@ cp .env.example .env
 docker compose --profile dev up --build -d
 ```
 
-> The `--profile dev` flag is required — the backend and frontend services are scoped to the `dev` profile and will not start without it.
+> The `--profile dev` flag is required, the backend and frontend services are scoped to the `dev` profile and will not start without it.
 
 Once running:
 
@@ -134,7 +134,7 @@ docker compose --profile dev down -v       # stop containers and wipe DB volume
 **Rebuilding after changes:**
 
 ```bash
-# Frontend env vars (e.g. VITE_API_BASE_URL) are baked in at build time —
+# Frontend env vars (e.g. VITE_API_BASE_URL) are baked in at build time 
 # a code or .env change requires a rebuild, not just a restart.
 docker compose build cashpilot-frontend
 docker compose up -d cashpilot-frontend
@@ -177,7 +177,7 @@ Defined in the root `.env` file:
 # Database
 DB_PASSWORD=123456
 
-# Frontend (baked into the build — requires rebuild on change)
+# Frontend (baked into the build, requires rebuild on change)
 VITE_API_BASE_URL=http://localhost:8080
 ```
 
