@@ -1,5 +1,6 @@
-import type { Customer, Page } from '../Customertypes';
+import type { Customer } from '../Customertypes';
 import { Button } from '../../../components/ui/Button';
+import type { Page } from '../../../types/page';
 
 interface CustomerTableProps {
   page:     Page<Customer>;
@@ -37,7 +38,7 @@ export function CustomerTable({ page, onView, onEdit, onDelete, onPage }: Custom
             </tr>
           </thead>
           <tbody className="divide-y divide-dark/[0.04]">
-            {content.map((c) => (
+            {content.map((c: any) => (
               <tr
                 key={c.id}
                 className="group hover:bg-neutral-bg-soft transition-colors cursor-pointer"

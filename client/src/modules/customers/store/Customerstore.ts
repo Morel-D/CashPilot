@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { Customer, Page } from '../Customertypes';
+import type { Customer } from '../Customertypes';
+import type { Page } from '../../../types/page';
 
 interface CustomerState {
   // List
@@ -62,7 +63,7 @@ export const useCustomerStore = create<CustomerState>()((set) => ({
       return {
         page: {
           ...s.page,
-          content: s.page.content.map((x) => (x.id === c.id ? c : x)),
+          content: s.page.content.map((x: any) => (x.id === c.id ? c : x)),
         },
       };
     }),
@@ -73,7 +74,7 @@ export const useCustomerStore = create<CustomerState>()((set) => ({
       return {
         page: {
           ...s.page,
-          content:       s.page.content.filter((x) => x.id !== id),
+          content:       s.page.content.filter((x: any) => x.id !== id),
           totalElements: s.page.totalElements - 1,
         },
       };
