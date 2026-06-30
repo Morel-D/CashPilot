@@ -53,16 +53,20 @@ public class InvoiceService {
             throw new IllegalArgumentException("INVOICE_INVALIDE_PERIODS");
         }
 
-        if (request.getCustomerId() == null) {
-            throw new IllegalArgumentException("INVOICE_CUSTOMER_REQUIRED");
-        }
+        // if (request.getCustomerId() == null) {
+        //     throw new IllegalArgumentException("INVOICE_CUSTOMER_REQUIRED");
+        // }
 
         
         Company company = companyRepository.findById(companyId)
             .orElseThrow(() -> new IllegalArgumentException("NO_COMPANY_FOUND"));
 
-        Customer customer = customerRepository.findByIdAndCompanyId(request.getCustomerId(), companyId)
+        Customer customer = null;
+
+        if(request.getCustomerId() != null){
+                    customer = customerRepository.findByIdAndCompanyId(request.getCustomerId(), companyId)
             .orElseThrow(() -> new IllegalArgumentException("Customer not found or does not belong to this company"));
+        }
 
         Invoice invoice = Invoice.builder()
                 .uid(System.currentTimeMillis())
@@ -205,6 +209,37 @@ public class InvoiceService {
         return mapToResponse(invoice);
     }
 
+
+    @Transactional
+    public InvoiceResponse updateInvoice(Long invoiceId, InvoiceRequest request) {
+        Long companyId = TenantContext.getCurrentCompanyId();
+
+        Invoice invoice = getInvoiceByIdAndCompany(invoiceId, companyId);
+
+        // Business Rule: Only DRAFT invoices can be edited
+        if (invoice.getStatus() != InvoiceStatus.DRAFT) {
+            throw new IllegalArgumentException("INVOICE_EDIT_DRAFT_ONLY");
+        }
+
+        // Update fields
+        invoice.setNumber(request.getNumber());
+        invoice.setTitle(request.getTitle());
+        invoice.setDescription(request.getDescription());
+        invoice.setAmount(request.getAmount());
+        invoice.setIssuedAt(request.getIssuedAt());
+        invoice.setDueAt(request.getDueAt());
+        invoice.setUpdateOf(LocalDateTime.now());
+
+        // Update Customer if provided (can change from null to a customer)
+        if (request.getCustomerId() != null) {
+            Customer customer = customerRepository.findByIdAndCompanyId(request.getCustomerId(), companyId)
+                    .orElseThrow(() -> new IllegalArgumentException("CUSTOMER_NOT_FOUND"));
+            invoice.setCustomer(customer);
+        }
+
+        Invoice updated = invoiceRepository.save(invoice);
+        return mapToResponse(updated);
+    }
 
 
     private Invoice getInvoiceByIdAndCompany(Long id, Long companyId) {

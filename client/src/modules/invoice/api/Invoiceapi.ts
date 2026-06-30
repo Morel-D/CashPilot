@@ -36,10 +36,14 @@ export const invoiceApi = {
   // ── Status transitions ────────────────────────────────────────────────────
  
   issue: (id: number) =>
-    apiClient.get<InvoiceResponse>(`/api/invoices/${id}/issue`),
+    apiClient.post<InvoiceResponse>(`/api/invoices/${id}/issue`, {
+      id: id
+    }),
  
   send: (id: number) =>
-    apiClient.get<InvoiceResponse>(`/api/invoices/${id}/send`),
+    apiClient.post<InvoiceResponse>(`/api/invoices/${id}/send`, {
+      id: id
+    }),
  
   pay: (id: number, body: Omit<PayInvoiceRequest, 'invoiceId'>) =>
     apiClient.post<InvoiceResponse>(`/api/invoices/${id}/pay`, {

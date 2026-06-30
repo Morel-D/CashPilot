@@ -91,7 +91,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 max-w-6xl">
+    <div className="flex flex-col gap-6">
 
       {/* Welcome */}
       <div className="flex items-end justify-between">

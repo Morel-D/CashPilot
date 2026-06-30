@@ -20,7 +20,7 @@ const MESSAGE_MAP: Record<string, string> = {
 
   // -- customer -------------------------------------------------------------
   CUSTOMER_EMAIL_EXIST: 'Customer with this email already exists in this company',
-  CUSTOMER_NOT_FOUND: 'Customer not found or access denied',
+  CUSTOMER_NOT_FOUND: 'Customer not found in the company',
 
   // -- Invoice -------------------------------------------------------------
   INVOICE_INVALIDE_PERIODS: 'Due date must be after issued date',
@@ -30,6 +30,7 @@ const MESSAGE_MAP: Record<string, string> = {
   INVOICE_PAID: 'Invoice is already paid',
   INVOICE_PAID_NOT_CANCEL: 'Cannot cancel a paid invoice',
   INVOICE_CUSTOMER_REQUIRED: 'Customer is required',
+  INVOICE_EDIT_DRAFT_ONLY: 'Only DRAFT invoices can be edited',
 
 
 
