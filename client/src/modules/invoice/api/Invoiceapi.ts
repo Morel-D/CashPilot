@@ -10,7 +10,7 @@ import type {
 import type { ApiResponse } from '../../../utils/Axios';
 
 export const invoiceApi = {
-
+ 
   getAll: (params: InvoicePageParams = {}) =>
     apiClient.get<InvoicePageResponse>('/api/invoices', {
       params: {
@@ -20,33 +20,34 @@ export const invoiceApi = {
         ...(params.status ? { status: params.status } : {}),
       },
     }),
-
+ 
   getById: (id: number) =>
     apiClient.get<InvoiceResponse>(`/api/invoices/${id}`),
-
+ 
   create: (body: CreateInvoiceRequest) =>
     apiClient.post<InvoiceResponse>('/api/invoices', body),
-
+ 
   update: (id: number, body: UpdateInvoiceRequest) =>
     apiClient.put<InvoiceResponse>(`/api/invoices/${id}`, body),
-
+ 
   delete: (id: number) =>
     apiClient.delete<ApiResponse<null>>(`/api/invoices/${id}`),
-
+ 
   // ── Status transitions ────────────────────────────────────────────────────
-
+ 
   issue: (id: number) =>
     apiClient.get<InvoiceResponse>(`/api/invoices/${id}/issue`),
-
+ 
   send: (id: number) =>
     apiClient.get<InvoiceResponse>(`/api/invoices/${id}/send`),
-
+ 
   pay: (id: number, body: Omit<PayInvoiceRequest, 'invoiceId'>) =>
     apiClient.post<InvoiceResponse>(`/api/invoices/${id}/pay`, {
-      invoiceId: id,
-      ...body,
-    }),
-
+      invoiceId:     id,
+      paidAmount:    body.paidAmount,
+      paymentMethod: body.paymentMethod,
+    } satisfies PayInvoiceRequest),
+ 
   cancel: (id: number) =>
     apiClient.post<InvoiceResponse>(`/api/invoices/${id}/cancel`, {}),
 };

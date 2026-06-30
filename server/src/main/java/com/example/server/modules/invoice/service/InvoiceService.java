@@ -124,6 +124,11 @@ public class InvoiceService {
 
     @Transactional
     public InvoiceResponse markAsPaid(Long invoiceId, PaymentRequest paymentRequest) {
+
+        System.out.println("Payement Request ---> "+ paymentRequest);
+        System.out.println("invoice id ---> "+ invoiceId);
+    
+
         Long companyId = TenantContext.getCurrentCompanyId();
         Invoice invoice = getInvoiceByIdAndCompany(invoiceId, companyId);
 

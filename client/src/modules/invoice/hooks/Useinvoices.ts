@@ -139,6 +139,8 @@ export function useInvoices() {
     data: Pick<PayInvoiceRequest, 'paidAmount' | 'paymentMethod'>
   ): Promise<boolean> => {
     try {
+      console.log("Pay Invoice id --> ", id);
+      console.log("Pay Invoice info --> ", data);
       const res  = await invoiceApi.pay(id, data);
       const body = res.data;
       toastFromResponse({ success: body.success, message: body.message, timestamp: body.timestamp });
