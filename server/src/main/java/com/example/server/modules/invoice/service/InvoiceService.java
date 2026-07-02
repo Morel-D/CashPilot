@@ -5,8 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.server.common.enums.AuditAction;
 import com.example.server.common.enums.InvoiceStatus;
 import com.example.server.common.enums.LedgerEntryType;
+import com.example.server.config.SecurityUtils;
+import com.example.server.modules.audit.service.AuditService;
 import com.example.server.modules.company.model.Company;
 import com.example.server.modules.company.repository.CompanyRepository;
 import com.example.server.modules.customer.dto.CustomerResponse;
@@ -35,6 +38,8 @@ public class InvoiceService {
     private final CustomerRepository customerRepository;
     private final PaymentRepository paymentRepository;
     private final LedgerEntryRepository ledgerEntryRepository;
+    private final AuditService auditService;
+    private final SecurityUtils securityUtils;
 
     
 
@@ -84,6 +89,19 @@ public class InvoiceService {
                 .build();
 
         Invoice saved = invoiceRepository.save(invoice);
+
+
+        // === AUDIT LOG ===
+        auditService.logInvoiceCreated(
+            saved.getId().toString(),
+            "Invoice #" + saved.getNumber() + " created",
+            companyId.toString(),
+            securityUtils.getCurrentUserId().toString(),
+            securityUtils.getCurrentUsername(),
+            securityUtils.getCurrentIpAddress(),
+            securityUtils.getCurrentUserAgent()
+        );
+
         return mapToResponse(saved);
     }
 
@@ -174,6 +192,18 @@ public class InvoiceService {
         invoice.setUpdateOf(LocalDateTime.now());
         invoiceRepository.save(invoice);
 
+
+        // === AUDIT LOG ===
+        auditService.logInvoicePaid(
+            invoice.getId().toString(),
+            "Invoice #" + invoice.getNumber() + " marked as paid",
+            companyId.toString(),
+            securityUtils.getCurrentUserId().toString(),
+            securityUtils.getCurrentUsername(),
+            securityUtils.getCurrentIpAddress(),
+            securityUtils.getCurrentUserAgent()
+        );
+
         return mapToResponse(invoice);
     }
 
@@ -192,6 +222,21 @@ public class InvoiceService {
         invoice.setUpdateOf(LocalDateTime.now());
 
         Invoice updated = invoiceRepository.save(invoice);
+
+        // === AUDIT LOG ===
+        auditService.log(
+            AuditAction.INVOICE_CANCELLED,
+            "Invoice",
+            updated.getId().toString(),
+            "Invoice #" + updated.getNumber() + " cancelled",
+            null, null,
+            companyId.toString(),
+            securityUtils.getCurrentUserId().toString(),
+            securityUtils.getCurrentUsername(),
+            securityUtils.getCurrentIpAddress(),
+            securityUtils.getCurrentUserAgent()
+        );
+
         return mapToResponse(updated);
     }
 
@@ -238,6 +283,22 @@ public class InvoiceService {
         }
 
         Invoice updated = invoiceRepository.save(invoice);
+
+
+        // === AUDIT LOG ===
+        auditService.log(
+            AuditAction.INVOICE_UPDATED,
+            "Invoice",
+            updated.getId().toString(),
+            "Invoice #" + updated.getNumber() + " updated",
+            null, null,
+            companyId.toString(),
+            securityUtils.getCurrentUserId().toString(),
+            securityUtils.getCurrentUsername(),
+            securityUtils.getCurrentIpAddress(),
+            securityUtils.getCurrentUserAgent()
+        );
+
         return mapToResponse(updated);
     }
 

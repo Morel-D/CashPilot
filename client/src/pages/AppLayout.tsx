@@ -44,6 +44,16 @@ const NAV = [
     </svg>
     ),
   },
+    {
+    label: 'Audit',
+    path:  '/audit',
+    exact: false,
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+      </svg>
+    ),
+  },
 ];
 
 // ─── Page title map ───────────────────────────────────────────────────────────
@@ -53,6 +63,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/customers': 'Customers',
   '/invoices': 'Invoices',
   '/transactions': 'Transactions',
+  '/audit': 'Audit',
 
 };
 
@@ -84,7 +95,7 @@ const AppLayout = () => {
 
         {/* Workspace badge */}
         {user?.company && (
-          <div className="mx-3 mt-4 px-3 py-2.5 rounded-lg bg-white/5 border border-white/[0.06] shrink-0">
+          <div className="mx-3 mt-4 px-3 py-2.5 rounded-lg bg-white/5 border border-white/6 shrink-0">
             <p className="font-sans text-[9px] font-semibold uppercase tracking-widest text-white/25 mb-1">
               Workspace
             </p>

@@ -7,6 +7,7 @@ import AppLayout from "../pages/AppLayout";
 import CustomersPage from "../pages/Customers";
 import InvoicesPage from "../pages/Invoices";
 import TransactionsPage from "../pages/Transactions";
+import AuditLogPage from "../pages/Auditlog";
 
 export const router = createBrowserRouter([
     // Public -------------------------------
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
             { path: 'customers',    element: <CustomersPage /> },
             { path: 'invoices',     element: <InvoicesPage />   },
             { path: 'transactions', element: <TransactionsPage /> },
+            { path: 'audit',        element: <AuditLogPage />     },
         ]
     },
 

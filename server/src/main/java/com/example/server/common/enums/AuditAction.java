@@ -1,0 +1,16 @@
+package com.example.server.common.enums;
+
+public enum AuditAction {
+    LOGIN,
+    LOGOUT,
+    CUSTOMER_CREATED,
+    CUSTOMER_UPDATED,
+    CUSTOMER_DELETED,
+    INVOICE_CREATED,
+    INVOICE_UPDATED,
+    INVOICE_ISSUED,
+    INVOICE_SENT,
+    INVOICE_PAID,
+    INVOICE_CANCELLED,
+    PAYMENT_PROCESSED,
+}

@@ -6,6 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.server.config.JwtUtil;
+import com.example.server.config.SecurityUtils;
+import com.example.server.modules.audit.service.AuditService;
 import com.example.server.modules.auth.dto.AuthRefreshResponse;
 import com.example.server.modules.auth.dto.AuthResponse;
 import com.example.server.modules.auth.dto.LoginRequest;
@@ -30,6 +32,8 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     private final CompanyService companyService;
+    private final AuditService auditService;
+    private final SecurityUtils securityUtils;
 
 
     public AuthResponse register(RegisterRequest request) {
@@ -97,6 +101,15 @@ public class AuthService {
                 .build();
 
         refreshTokenRepository.save(refreshToken);
+
+        // === AUDIT LOG ===
+        auditService.logLogin(
+                user.getId().toString(),
+                user.getEmail(),
+                companyId.toString(),
+                securityUtils.getCurrentIpAddress(), 
+                securityUtils.getCurrentUserAgent()
+        );
 
         return new AuthResponse(accessToken, refreshTokenStr);
     }

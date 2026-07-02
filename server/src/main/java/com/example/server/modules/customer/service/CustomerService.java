@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.server.common.enums.AuditAction;
+import com.example.server.config.SecurityUtils;
+import com.example.server.modules.audit.service.AuditService;
 import com.example.server.modules.company.model.Company;
 import com.example.server.modules.company.repository.CompanyRepository;
 import com.example.server.modules.customer.dto.CustomerRequest;
@@ -23,6 +26,8 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CompanyRepository companyRepository;
+    private final AuditService auditService;
+    private final SecurityUtils securityUtils;
 
 
     @Transactional
@@ -54,6 +59,17 @@ public class CustomerService {
 
         Customer saved = customerRepository.save(customer);
 
+        // === AUDIT LOG ===
+        auditService.logCustomerCreated(
+            saved.getId().toString(),
+            "Customer created: " + saved.getName(),
+            currentCompanyId.toString(),
+            securityUtils.getCurrentUserId().toString(),
+            securityUtils.getCurrentUsername(),
+            securityUtils.getCurrentIpAddress(),
+            securityUtils.getCurrentUserAgent()
+        );
+
         return mapToResponse(saved);
     }
 
@@ -83,6 +99,21 @@ public class CustomerService {
         customer.setUpdateOf(LocalDateTime.now());
 
         Customer updated = customerRepository.save(customer);
+
+        // === AUDIT LOG - UPDATE ===
+        auditService.log(
+            AuditAction.CUSTOMER_UPDATED,
+            "Customer",
+            updated.getId().toString(),
+            "Customer updated: " + updated.getName(),
+            null, null,
+            currentCompanyId.toString(),
+            securityUtils.getCurrentUserId().toString(),
+            securityUtils.getCurrentUsername(),
+            securityUtils.getCurrentIpAddress(),
+            securityUtils.getCurrentUserAgent()
+        );
+
         return mapToResponse(updated);
     }
 
@@ -91,8 +122,23 @@ public class CustomerService {
         Long currentCompanyId = TenantContext.getCurrentCompanyId();
         Customer customer = customerRepository.findByIdAndCompanyId(id, currentCompanyId)
                 .orElseThrow(() -> new IllegalArgumentException("CUSTOMER_NOT_FOUND"));
+                
 
         customerRepository.delete(customer);
+
+        // === AUDIT LOG - DELETE ===
+        auditService.log(
+            AuditAction.CUSTOMER_DELETED,
+            "Customer",
+            id.toString(),
+            "Customer deleted: " + customer.getName(),
+            null, null,
+            currentCompanyId.toString(),
+            securityUtils.getCurrentUserId().toString(),
+            securityUtils.getCurrentUsername(),
+            securityUtils.getCurrentIpAddress(),
+            securityUtils.getCurrentUserAgent()
+        );
     }
     
     
