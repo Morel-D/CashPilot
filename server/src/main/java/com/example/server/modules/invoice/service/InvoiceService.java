@@ -15,6 +15,7 @@ import com.example.server.modules.company.repository.CompanyRepository;
 import com.example.server.modules.customer.dto.CustomerResponse;
 import com.example.server.modules.customer.model.Customer;
 import com.example.server.modules.customer.repository.CustomerRepository;
+import com.example.server.modules.dashbaord.service.DashboardService;
 import com.example.server.modules.invoice.dto.InvoiceRequest;
 import com.example.server.modules.invoice.dto.InvoiceResponse;
 import com.example.server.modules.invoice.model.Invoice;
@@ -40,6 +41,7 @@ public class InvoiceService {
     private final LedgerEntryRepository ledgerEntryRepository;
     private final AuditService auditService;
     private final SecurityUtils securityUtils;
+    private final DashboardService dashboardService;
 
     
 
@@ -192,6 +194,8 @@ public class InvoiceService {
         invoice.setUpdateOf(LocalDateTime.now());
         invoiceRepository.save(invoice);
 
+        // after payment....
+        dashboardService.invalidateCache();
 
         // === AUDIT LOG ===
         auditService.logInvoicePaid(

@@ -24,4 +24,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Page<Customer> findByCompanyIdAndNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
             Long companyId, String name, String email, Pageable pageable);
+
+    long countByCompanyId(Long companyId);
 }
