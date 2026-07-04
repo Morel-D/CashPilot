@@ -104,6 +104,8 @@ public class InvoiceService {
             securityUtils.getCurrentUserAgent()
         );
 
+        dashboardService.invalidateCache();
+
         return mapToResponse(saved);
     }
 
@@ -122,6 +124,9 @@ public class InvoiceService {
         invoice.setUpdateOf(LocalDateTime.now());
 
         Invoice updated = invoiceRepository.save(invoice);
+
+        dashboardService.invalidateCache();
+
         return mapToResponse(updated);
     }
 
@@ -140,6 +145,9 @@ public class InvoiceService {
         invoice.setUpdateOf(LocalDateTime.now());
 
         Invoice updated = invoiceRepository.save(invoice);
+
+                dashboardService.invalidateCache();
+
         return mapToResponse(updated);
     }
 
@@ -241,6 +249,8 @@ public class InvoiceService {
             securityUtils.getCurrentUserAgent()
         );
 
+                dashboardService.invalidateCache();
+
         return mapToResponse(updated);
     }
 
@@ -302,6 +312,8 @@ public class InvoiceService {
             securityUtils.getCurrentIpAddress(),
             securityUtils.getCurrentUserAgent()
         );
+
+                dashboardService.invalidateCache();
 
         return mapToResponse(updated);
     }

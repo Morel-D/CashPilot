@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.server.common.enums.InvoiceStatus;
 import com.example.server.common.enums.LedgerEntryType;
+import com.example.server.modules.dashbaord.service.DashboardService;
 import com.example.server.modules.invoice.model.Invoice;
 import com.example.server.modules.invoice.repository.InvoiceRepository;
 import com.example.server.modules.ledger.model.LedgerEntry;
@@ -25,6 +26,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final InvoiceRepository invoiceRepository;
     // private final LedgerEntryRepository ledgerEntryRepository;
+    private final DashboardService dashboardService;
 
 
     // Pay an invoice -> Creates Payment + Ledger Entry
@@ -71,6 +73,8 @@ public class PaymentService {
         invoice.setStatus(InvoiceStatus.PAID);
         invoice.setUpdateOf(LocalDateTime.now());
         invoiceRepository.save(invoice);
+
+        dashboardService.invalidateCache();
 
         return mapToResponse(savedPayment);
     }

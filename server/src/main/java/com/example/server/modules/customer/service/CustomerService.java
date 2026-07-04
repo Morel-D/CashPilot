@@ -15,6 +15,7 @@ import com.example.server.modules.customer.dto.CustomerRequest;
 import com.example.server.modules.customer.dto.CustomerResponse;
 import com.example.server.modules.customer.model.Customer;
 import com.example.server.modules.customer.repository.CustomerRepository;
+import com.example.server.modules.dashbaord.service.DashboardService;
 import com.example.server.modules.tenant.TenantContext;
 
 import jakarta.transaction.Transactional;
@@ -28,7 +29,7 @@ public class CustomerService {
     private final CompanyRepository companyRepository;
     private final AuditService auditService;
     private final SecurityUtils securityUtils;
-
+    private final DashboardService dashboardService;
 
     @Transactional
     public CustomerResponse createCustomer(CustomerRequest request) {
@@ -69,6 +70,8 @@ public class CustomerService {
             securityUtils.getCurrentIpAddress(),
             securityUtils.getCurrentUserAgent()
         );
+
+        dashboardService.invalidateCache();
 
         return mapToResponse(saved);
     }
@@ -139,6 +142,8 @@ public class CustomerService {
             securityUtils.getCurrentIpAddress(),
             securityUtils.getCurrentUserAgent()
         );
+
+        dashboardService.invalidateCache();
     }
     
     
