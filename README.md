@@ -1,16 +1,15 @@
 # CashPilot - Treasury & Cash Management Platform
 
 ## Overview
-
 CashPilot is a modern treasury and cash management platform designed to help businesses track, control, and optimize their cash flow through invoices, payments, and financial records.
 
 **Current Status**: In active development (MVP Phase)
 
 ---
 
-## Current Progress (as of June 30, 2026)
+## Current Progress (as of July 6, 2026)
 
-### Completed
+### ✅ Completed
 
 **Backend**
 - Project Structure: Feature-based modular architecture
@@ -22,20 +21,23 @@ CashPilot is a modern treasury and cash management platform designed to help bus
 - Entities & Enums: `InvoiceStatus`, `LedgerEntryType` (DEBIT/CREDIT), general status fields
 - Configuration: `.env` support + Flyway integration
 - API Design: Consistent `ApiResponse<T>` wrapper + Global Exception Handler
+- Redis Integration: Caching with Cache Aside Pattern, TTL, and manual invalidation
+- Background Jobs: Scheduled tasks (e.g. overdue invoice detection)
 - Modules Completed:
   - **Auth**: User + Company creation during registration
   - **Customer**: Full CRUD
   - **Invoice**: CRUD + State Transitions (DRAFT → ISSUED → SENT → PAID, etc.)
-  - **Payment**: Triggered from Invoice pay endpoint
+  - **Payment**: Triggered from Invoice pay endpoint with full orchestration
   - **Ledger**: Automatic entry on payment (CREDIT/DEBIT logic)
   - **Transaction Listing**: Full history view
+  - **Dashboard**: Metrics cards (Revenue Today, Outstanding, Overdue, Total Customers) + Recent Transactions + Pending Invoices
 
 **Frontend**
 - Project Structure: Feature-based modular architecture (`page` / `component` / `hook` / `store` / `api` per module)
 - Stack: React 18 + TypeScript + Vite + Tailwind CSS v4 + Zustand
 - Design System: Custom Tailwind theme (brand colors, typography scale, shared component classes)
 - Authentication: Access-token-in-memory flow, silent session rehydration on page reload via `GET /api/auth/refresh`, protected routing
-- Reusable UI Library: `Button` (5 variants, loading state), `Input`, `Select`, `Modal`, `Loader`, custom form-level validation (no native browser validation)
+- Reusable UI Library: `Button` (5 variants, loading state), `Input`, `Select`, `Modal`, `Loader`, custom form-level validation
 - Toast Notification System: Global Zustand-backed toast queue, backend message-code mapping
 - Modules Completed:
   - **Auth**: Login / Register (2-step wizard: personal info → company info)
@@ -45,17 +47,14 @@ CashPilot is a modern treasury and cash management platform designed to help bus
 
 **DevOps**
 - Docker Setup:
-  - `docker-compose.yml` orchestrating PostgreSQL, Backend, and Frontend
+  - `docker-compose.yml` orchestrating PostgreSQL, Backend, Frontend, and Redis
   - Multi-stage `Dockerfile` for the backend (Maven build → JRE runtime)
   - Multi-stage `Dockerfile` for the frontend (Node build → Nginx static serve)
   - Custom `nginx.conf` for SPA client-side routing, gzip compression, and static asset caching
   - Shared Docker network (`cashpilot-network`) for inter-service communication
   - Environment-driven configuration via root `.env` (DB credentials, frontend API base URL injected at build time)
-
-### In Progress
-- Advanced reporting & dashboard analytics
-- Role-based access control
-- End-to-end testing & documentation
+- Live Deployment:
+  - Client on Vercel, Server on Render (Docker), Database on Neon, Redis on Upstash
 
 ---
 
@@ -63,11 +62,12 @@ CashPilot is a modern treasury and cash management platform designed to help bus
 
 | Layer            | Technology                                             |
 |-------------------|----------------------------------------------------------|
-| Backend          | Java 21, Spring Boot 3, Spring Security, JWT              |
+| Backend          | Java 21, Spring Boot 3, Spring Security, JWT, Redis      |
 | Database         | PostgreSQL, Flyway                                         |
 | Frontend         | React 18, TypeScript, Vite, Tailwind CSS v4, Zustand       |
+| Background Jobs  | Spring @Scheduled                                          |
 | Containerization | Docker, Docker Compose                                     |
-| Web Server       | Nginx (frontend static serving)                            |
+| Web Server       | Nginx (frontend static serving, local Docker only)          |
 | Build Tools      | Maven (backend), npm (frontend)                            |
 
 ---
@@ -114,7 +114,7 @@ cp .env.example .env
 docker compose --profile dev up --build -d
 ```
 
-> The `--profile dev` flag is required, the backend and frontend services are scoped to the `dev` profile and will not start without it.
+> The `--profile dev` flag is required, the backend and frontend services are scoped to the `dev` profile and will not start without it. This flag is a **local-only convenience** — it has no effect on the deployed environment, since Render and Vercel each build from their own service's Dockerfile/build settings directly and never read `docker-compose.yml`.
 
 Once running:
 
@@ -123,6 +123,7 @@ Once running:
 | Frontend  | http://localhost:5173   |
 | Backend   | http://localhost:8080   |
 | Postgres  | localhost:5432           |
+| Redis     | localhost:6379           |
 
 **Stopping services:**
 
@@ -171,7 +172,7 @@ The frontend dev server runs on `http://localhost:5173` and expects the backend 
 
 ## Environment Variables
 
-Defined in the root `.env` file:
+Defined in the root `.env` file (local Docker):
 
 ```bash
 # Database
@@ -180,6 +181,74 @@ DB_PASSWORD=123456
 # Frontend (baked into the build, requires rebuild on change)
 VITE_API_BASE_URL=http://localhost:8080
 ```
+
+See the [Deployment](#deployment) section below for the equivalent variables in the live environment.
+
+---
+
+## Deployment
+
+CashPilot's live environment is split across four managed platforms instead of the single Docker network used locally. Each piece is deployed and configured independently.
+
+| Layer     | Platform | Notes |
+|-----------|----------|-------|
+| Client    | Vercel   | Builds the React app from `client/`, static hosting |
+| Server    | Render   | Runs `server/Dockerfile` (Spring Boot, Docker-based) |
+| Database  | Neon     | Managed PostgreSQL, replaces local Postgres container |
+| Redis     | Upstash  | Managed Redis, replaces local Redis container |
+
+### Client (Vercel)
+
+- Vercel builds `client/` directly — it does **not** use `client/Dockerfile` or `nginx.conf`; those are only relevant if the frontend is ever self-hosted as a container instead.
+- Set in **Vercel → Project → Settings → Environment Variables**:
+  ```bash
+  VITE_API_BASE_URL=https://cashpilot-fx29.onrender.com
+  ```
+- Because Vite bakes env vars into the build at build time, any change to `VITE_API_BASE_URL` requires a **redeploy**, not just a restart — same rule as local Docker.
+
+### Server (Render)
+
+- Render builds and runs `server/Dockerfile` directly; it does not read `docker-compose.yml` or use the `--profile dev` flag.
+- Set in **Render → Service → Environment**:
+  ```bash
+  DATABASE_URL=<neon-connection-string>   # requires SSL
+  REDIS_URL=rediss://default:<password>@<host>:6379   # note: rediss:// (TLS)
+  JWT_SECRET=<your-secret>
+  ```
+- `application.properties` reads these via placeholders, e.g.:
+  ```properties
+  spring.data.redis.url=${REDIS_URL}
+  spring.data.redis.ssl.enabled=true
+  ```
+- **CORS**: `SecurityConfig`'s allowed origins must include the deployed Vercel domain (not the backend's own Render URL):
+  ```java
+  configuration.setAllowedOrigins(List.of(
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "https://cash-pilot-ten.vercel.app"
+  ));
+  ```
+- **Free tier idle spin-down**: Render's free tier spins the service down after ~15 minutes of inactivity, causing a slow first request afterward. An uptime bot (e.g. UptimeRobot) pinging a public health endpoint every 5 minutes keeps it warm:
+  ```
+  https://cashpilot-fx29.onrender.com/actuator/health
+  ```
+  This requires exposing Spring Boot Actuator's health endpoint and permitting it in `SecurityConfig`:
+  ```properties
+  management.endpoints.web.exposure.include=health
+  management.endpoint.health.show-details=never
+  ```
+  ```java
+  .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
+  ```
+
+### Database (Neon)
+
+- Replaces the local Postgres container. Requires an SSL-enabled connection string (unlike the local compose default), passed to the server as `DATABASE_URL`.
+- Flyway migrations run the same way as local — no changes needed to migration scripts themselves.
+
+### Redis (Upstash)
+
+- Replaces the local Redis container. The compose setup connects to Redis via the Docker network hostname (`redis`); in production this must instead point to Upstash's public TLS endpoint via `REDIS_URL`, never a hardcoded local hostname.
 
 ---
 
