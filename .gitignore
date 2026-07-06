@@ -65,6 +65,10 @@ backend/application-*.properties
 .env
 .env.local
 .env.*.local
+client/.env.local
+client/.env.development
+client/.env.test
+client/.env.production
 
 # OS generated
 .DS_Store
