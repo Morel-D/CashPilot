@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useTransactions } from '../modules/transactions/hooks/Usetransactions';
+import { useTransactions } from '../modules/transactions/hooks/useTransactions';
 import { TransactionTable } from '../modules/transactions/components/Transactiontable';
 import { TransactionDetail } from '../modules/transactions/components/Transactiondetail';
 import { Loader } from '../components/ui/Loader';

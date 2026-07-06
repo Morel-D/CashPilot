@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../modules/auth/store/authStore';
-import { useDashboard } from '../modules/dashboard/hooks/Usedashboard';
+import { useDashboard } from '../modules/dashboard/hooks/useDashboard';
 import type { RecentTransaction, PendingInvoice } from '../modules/dashboard/Dashboardtypes';
 
 // ─── Stat card ────────────────────────────────────────────────────────────────

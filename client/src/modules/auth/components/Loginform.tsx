@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
-import { useLogin } from '../hook/Uselogin';
+import { useLogin } from '../hooks/useLogin';
 import type { LoginRequest } from '../AuthTypes';
 
 const EmailIcon = (

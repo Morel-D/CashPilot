@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAudit } from '../modules/audit/hook/Useaudit';
+import { useAudit } from '../modules/audit/hooks/useAudit';
 import { AuditTable } from '../modules/audit/components/Audittable';
 import { AuditDetail } from '../modules/audit/components/Auditdetail';
 import { AuditActionBadge } from '../modules/audit/components/Auditactionbadge';

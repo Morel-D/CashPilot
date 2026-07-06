@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
 import { Button } from '../../../components/ui/Button';
-import { useRegister } from '../hook/Useregister';
+import { useRegister } from '../hooks/useRegister';
 import type { RegisterStep1, RegisterStep2 } from '../AuthTypes';
 
 // ─── Currency options ─────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useCustomers } from '../modules/customers/hooks/Usecustomers';
+import { useCustomers } from '../modules/customers/hooks/useCustomers';
 import { CustomerTable } from '../modules/customers/components/Customertable';
 import { CustomerForm } from '../modules/customers/components/Customerform';
 import { CustomerView } from '../modules/customers/components/Customerview';

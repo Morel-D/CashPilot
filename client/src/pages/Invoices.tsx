@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useInvoices } from '../modules/invoice/hooks/Useinvoices';
+import { useInvoices } from '../modules/invoice/hooks/useInvoices';
 import { InvoiceTable } from '../modules/invoice/components/Invoicetable';
 import { InvoiceForm } from '../modules/invoice/components/Invoiceform';
 import { InvoiceView } from '../modules/invoice/components/Invoiceview';
