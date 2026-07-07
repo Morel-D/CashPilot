@@ -1,4 +1,3 @@
-
 import Toast from './Toast';
 import { useToastStore } from './Toaststore';
 
@@ -9,7 +8,6 @@ export function ToastContainer() {
 
   return (
     <>
-      {/* Progress bar keyframe — injected once */}
       <style>{`
         @keyframes shrink {
           from { width: 100%; }
@@ -17,7 +15,11 @@ export function ToastContainer() {
         }
       `}</style>
 
-      <div className="fixed bottom-6 right-5 z-50 flex flex-col gap-2.5 w-full max-w-85">
+      {/*
+        Mobile  : bottom-3, left/right-3 → full width with small gutter
+        Desktop : bottom-6, right-5, fixed width 340px, anchored to right
+      */}
+      <div className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-5 sm:bottom-6 z-50 flex flex-col gap-2 sm:w-85">
         {toasts.map((t) => (
           <Toast
             key={t.id}

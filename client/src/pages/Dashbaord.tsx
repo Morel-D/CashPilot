@@ -15,25 +15,33 @@ interface StatCardProps {
 }
 
 function StatCard({ label, value, note, loading, icon, accent = 'default' }: StatCardProps) {
-  const iconColor = { default: 'text-neutral-text-muted/50', warning: 'text-amber-400', danger: 'text-red-400' }[accent];
+  const iconColor = {
+    default: 'text-neutral-text-muted/50',
+    warning: 'text-amber-400',
+    danger:  'text-red-400',
+  }[accent];
+
   return (
-    <div className="card flex flex-col gap-3">
+    <div className="card flex flex-col gap-2 p-4 md:p-6">
       <div className="flex items-center justify-between">
         <span className="field-label">{label}</span>
         <span className={iconColor}>{icon}</span>
       </div>
       <div>
         {loading ? (
-          <div className="flex items-center gap-1 h-8">
-            {[0,1,2].map((i) => (
-              <div key={i} className="size-1.5 rounded-full bg-dark/15 animate-pulse"
-                style={{ animationDelay: `${i * 150}ms`, animationDuration: '900ms' }} />
+          <div className="flex items-center gap-1 h-7">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="size-1.5 rounded-full bg-dark/15 animate-pulse"
+                style={{ animationDelay: `${i * 150}ms`, animationDuration: '900ms' }}
+              />
             ))}
           </div>
         ) : (
-          <p className="amount text-2xl font-semibold text-dark">{value}</p>
+          <p className="amount text-lg md:text-2xl font-semibold text-dark leading-tight">{value}</p>
         )}
-        <p className="font-sans text-xs text-neutral-text-muted mt-0.5">{note}</p>
+        <p className="font-sans text-[10px] md:text-xs text-neutral-text-muted mt-0.5">{note}</p>
       </div>
     </div>
   );
@@ -45,9 +53,9 @@ function RecentTransactionsPanel({
   items, loading, currency,
 }: { items: RecentTransaction[]; loading: boolean; currency: string }) {
   if (loading) return (
-    <div className="flex items-center justify-center py-10">
+    <div className="flex items-center justify-center py-8">
       <div className="flex items-center gap-1">
-        {[0,1,2].map((i) => (
+        {[0, 1, 2].map((i) => (
           <div key={i} className="size-1.5 rounded-full bg-dark/15 animate-pulse"
             style={{ animationDelay: `${i * 150}ms`, animationDuration: '900ms' }} />
         ))}
@@ -56,8 +64,8 @@ function RecentTransactionsPanel({
   );
 
   if (items.length === 0) return (
-    <div className="info-zone flex flex-col items-center justify-center py-8 gap-1.5">
-      <p className="font-sans text-sm text-neutral-text-muted">No recent transactions.</p>
+    <div className="info-zone flex items-center justify-center py-6">
+      <p className="font-sans text-xs text-neutral-text-muted">No recent transactions.</p>
     </div>
   );
 
@@ -66,22 +74,19 @@ function RecentTransactionsPanel({
       {items.map((t) => {
         const isCredit = t.type === 'CREDIT';
         return (
-          <div key={t.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Type dot */}
+          <div key={t.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className={`size-1.5 rounded-full shrink-0 ${isCredit ? 'bg-emerald-500' : 'bg-red-400'}`} />
               <div className="min-w-0">
                 <p className="font-sans text-xs font-medium text-dark truncate">
                   {t.description ?? (isCredit ? 'Payment received' : 'Payment sent')}
                 </p>
                 {t.invoiceNumber && (
-                  <p className="font-mono text-[10px] text-neutral-text-muted">
-                    {t.invoiceNumber}
-                  </p>
+                  <p className="font-mono text-[10px] text-neutral-text-muted">{t.invoiceNumber}</p>
                 )}
               </div>
             </div>
-            <div className="text-right shrink-0 ml-4">
+            <div className="text-right shrink-0 ml-3">
               <p className={`font-mono text-xs font-semibold ${isCredit ? 'text-emerald-600' : 'text-red-500'}`}>
                 {isCredit ? '+' : '-'}{currency} {t.amount.toLocaleString('en', { minimumFractionDigits: 2 })}
               </p>
@@ -102,9 +107,9 @@ function PendingInvoicesPanel({
   items, loading, currency,
 }: { items: PendingInvoice[]; loading: boolean; currency: string }) {
   if (loading) return (
-    <div className="flex items-center justify-center py-10">
+    <div className="flex items-center justify-center py-8">
       <div className="flex items-center gap-1">
-        {[0,1,2].map((i) => (
+        {[0, 1, 2].map((i) => (
           <div key={i} className="size-1.5 rounded-full bg-dark/15 animate-pulse"
             style={{ animationDelay: `${i * 150}ms`, animationDuration: '900ms' }} />
         ))}
@@ -113,8 +118,8 @@ function PendingInvoicesPanel({
   );
 
   if (items.length === 0) return (
-    <div className="info-zone flex flex-col items-center justify-center py-8 gap-1.5">
-      <p className="font-sans text-sm text-neutral-text-muted">No pending invoices.</p>
+    <div className="info-zone flex items-center justify-center py-6">
+      <p className="font-sans text-xs text-neutral-text-muted">No pending invoices.</p>
     </div>
   );
 
@@ -123,20 +128,20 @@ function PendingInvoicesPanel({
       {items.map((inv) => {
         const isOverdue = new Date(inv.dueAt) < new Date();
         return (
-          <div key={inv.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+          <div key={inv.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
             <div className="min-w-0">
               <p className="font-sans text-xs font-medium text-dark truncate">{inv.title}</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="font-mono text-[10px] text-neutral-text-muted">{inv.number}</span>
+              <div className="flex items-center gap-1 mt-0.5 min-w-0">
+                <span className="font-mono text-[10px] text-neutral-text-muted shrink-0">{inv.number}</span>
                 {inv.customerName && (
                   <>
-                    <span className="text-dark/20 text-[10px]">·</span>
+                    <span className="text-dark/20 text-[10px] shrink-0">·</span>
                     <span className="font-sans text-[10px] text-neutral-text-muted truncate">{inv.customerName}</span>
                   </>
                 )}
               </div>
             </div>
-            <div className="text-right shrink-0 ml-4">
+            <div className="text-right shrink-0 ml-3">
               <p className="font-mono text-xs font-semibold text-dark">
                 {currency} {inv.amount.toLocaleString('en', { minimumFractionDigits: 2 })}
               </p>
@@ -196,37 +201,37 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 md:gap-6">
 
       {/* Welcome */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-1.5">
         <div>
-          <h2 className="font-display text-2xl font-light text-dark">
+          <h2 className="font-display text-xl md:text-2xl font-light text-dark">
             Good morning, {firstName}.
           </h2>
-          <p className="font-sans text-sm text-neutral-text-muted mt-0.5">
+          <p className="font-sans text-xs md:text-sm text-neutral-text-muted mt-0.5">
             Here's what's happening with{' '}
             <span className="text-dark font-medium">{user?.company?.name ?? 'your company'}</span>{' '}
             today.
           </p>
         </div>
-        <span className="font-mono text-xs text-neutral-text-muted bg-white border border-dark/8 px-3 py-1.5 rounded-lg">
+        <span className="font-mono text-[10px] md:text-xs text-neutral-text-muted bg-white border border-dark/8 px-2.5 py-1 rounded-lg self-start sm:self-auto whitespace-nowrap">
           {new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
         </span>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      {/* Stats — 2 cols on mobile, 4 on xl */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
         {STATS.map((s) => <StatCard key={s.label} {...s} />)}
       </div>
 
-      {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Bottom panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
 
-        <div className="card flex flex-col gap-4">
+        <div className="card flex flex-col gap-3 p-4 md:p-6">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-sm font-light text-dark">Recent Transactions</h3>
-            <span className="field-label">Latest activity</span>
+            <span className="field-label">Latest</span>
           </div>
           <RecentTransactionsPanel
             items={recentTransactions}
@@ -235,10 +240,10 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="card flex flex-col gap-4">
+        <div className="card flex flex-col gap-3 p-4 md:p-6">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-sm font-light text-dark">Pending Invoices</h3>
-            <span className="field-label">Awaiting payment</span>
+            <span className="field-label">Unpaid</span>
           </div>
           <PendingInvoicesPanel
             items={pendingInvoices}

@@ -9,26 +9,28 @@ public class ApiResponse<T> {
     private String message;
     private Object errors;
     private LocalDateTime timestamp;
+    private String correlationId;
     
-    public ApiResponse(boolean success, T data, String message, Object errors, LocalDateTime timestamp) {
+    public ApiResponse(boolean success, T data, String message, Object errors, LocalDateTime timestamp, String correlationId) {
         this.success = success;
         this.data = data;
         this.message = message;
         this.errors = errors;
         this.timestamp = timestamp;
+        this.correlationId = correlationId;
     }
 
 
     // Success Response
     public static <T> ApiResponse<T> success(T data, String message) {
-        return new ApiResponse<>(true, data, message, null, LocalDateTime.now());
+        return new ApiResponse<>(true, data, message, null, LocalDateTime.now(), null);
     }
 
 
     // Error Response
-    public static <T> ApiResponse<T> error(String message, Object errors) {
+    public static <T> ApiResponse<T> error(String message, Object errors, String correlationId) {
         String upperMessage = (message == null) ? "ERROR" : message.toUpperCase();
-        return new ApiResponse<>(false, null, upperMessage, errors, LocalDateTime.now());
+        return new ApiResponse<>(false, null, upperMessage, errors, LocalDateTime.now(), correlationId);
     }
 
     public boolean isSuccess() {
@@ -61,6 +63,14 @@ public class ApiResponse<T> {
     }
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 
 

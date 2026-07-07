@@ -19,7 +19,6 @@ function formatTime(iso: string): string {
   } catch { return ''; }
 }
 
-
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -86,7 +85,7 @@ const Toast: React.FC<ToastProps> = ({
       }`}
     >
       <div className={`
-        relative flex items-start gap-3 rounded-xl px-4 py-3.5
+        relative flex items-start gap-2.5 rounded-xl px-3 py-3 sm:px-4 sm:py-3.5 overflow-hidden
         border shadow-card-hover backdrop-blur-sm bg-white
         ${success ? 'border-emerald-500/20' : 'border-red-500/20'}
       `}>
@@ -96,27 +95,25 @@ const Toast: React.FC<ToastProps> = ({
           success ? 'bg-emerald-500' : 'bg-red-500'
         }`} />
 
-        {/* Icon */}
-        <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-0.5 ${
+        {/* Icon — smaller on mobile */}
+        <div className={`shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mt-0.5 ${
           success ? 'bg-emerald-500/10' : 'bg-red-500/10'
         }`}>
           {success ? (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4 text-emerald-500">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-3 sm:size-4 text-emerald-500">
               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4 text-red-500">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-3 sm:size-4 text-red-500">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
             </svg>
           )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0 pl-1">
-
-          {/* Title row */}
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className={`font-sans text-[11px] font-semibold uppercase tracking-wider ${
+        <div className="flex-1 min-w-0 pl-0.5">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className={`font-sans text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider ${
               success ? 'text-emerald-500' : 'text-red-500'
             }`}>
               {success ? 'Success' : 'Error'}
@@ -126,16 +123,15 @@ const Toast: React.FC<ToastProps> = ({
             </span>
           </div>
 
-          {/* Message */}
-          <p className="font-sans text-[12px] text-dark leading-relaxed">
+          <p className="font-sans text-[11px] sm:text-[12px] text-dark leading-relaxed">
             {formatMessage(message)}
           </p>
 
           {/* Correlation ID — errors only */}
           {!success && correlationId && (
-            <div className="flex items-center gap-1.5 mt-2 px-2 py-1 rounded-md bg-neutral-bg-soft border border-dark/10 w-fit">
-              <span className="font-sans text-[9px] uppercase tracking-widest text-neutral-text-muted">ID</span>
-              <span className="font-mono text-[10px] text-neutral-text-muted truncate max-w-[160px]">
+            <div className="flex items-center gap-1.5 mt-1.5 px-1.5 py-0.5 rounded-md bg-neutral-bg-soft border border-dark/10 w-fit max-w-full overflow-hidden">
+              <span className="font-sans text-[9px] uppercase tracking-widest text-neutral-text-muted shrink-0">ID</span>
+              <span className="font-mono text-[10px] text-neutral-text-muted truncate">
                 {correlationId}
               </span>
               <CopyButton text={correlationId} />
@@ -149,13 +145,13 @@ const Toast: React.FC<ToastProps> = ({
           aria-label="Close"
           className="flex-shrink-0 text-neutral-text-muted hover:text-dark transition-colors mt-0.5"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-3.5 sm:size-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
 
         {/* Progress bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-b-xl overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-[2px]">
           <div
             className={`h-full ${success ? 'bg-emerald-500/30' : 'bg-red-500/30'}`}
             style={{ animation: `shrink ${duration}ms linear forwards` }}

@@ -29,8 +29,8 @@ const NAV = [
     path:  '/invoices',
     exact: false,
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-4">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
       </svg>
     ),
   },
@@ -39,35 +39,30 @@ const NAV = [
     path:  '/transactions',
     exact: false,
     icon: (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-4">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
-    </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+      </svg>
     ),
   },
-    {
+  {
     label: 'Audit',
     path:  '/audit',
     exact: false,
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
       </svg>
     ),
   },
 ];
 
-// ─── Page title map ───────────────────────────────────────────────────────────
-
 const PAGE_TITLES: Record<string, string> = {
-  '/':          'Dashboard',
-  '/customers': 'Customers',
-  '/invoices': 'Invoices',
+  '/':             'Dashboard',
+  '/customers':    'Customers',
+  '/invoices':     'Invoices',
   '/transactions': 'Transactions',
-  '/audit': 'Audit',
-
+  '/audit':        'Audit',
 };
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function initials(name: string) {
   return name.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase();
@@ -83,8 +78,8 @@ const AppLayout = () => {
   return (
     <div className="flex h-screen bg-neutral-bg-soft overflow-hidden">
 
-      {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-      <aside className="flex flex-col w-56 shrink-0 bg-dark h-full border-r border-white/5">
+      {/* ── Sidebar — hidden on mobile, visible md+ ───────────────────────── */}
+      <aside className="hidden md:flex flex-col w-56 shrink-0 bg-dark h-full border-r border-white/5">
 
         {/* Logo */}
         <div className="flex items-center h-16 px-5 shrink-0 border-b border-white/5">
@@ -113,7 +108,6 @@ const AppLayout = () => {
           <p className="font-sans text-[9px] font-semibold uppercase tracking-widest text-white/20 px-2 mb-2">
             Menu
           </p>
-
           {NAV.map(({ label, path, exact, icon }) => (
             <NavLink
               key={path}
@@ -135,9 +129,7 @@ const AppLayout = () => {
                     {icon}
                   </span>
                   <span className="flex-1">{label}</span>
-                  {isActive && (
-                    <span className="size-1.5 rounded-full bg-primary shrink-0" />
-                  )}
+                  {isActive && <span className="size-1.5 rounded-full bg-primary shrink-0" />}
                 </>
               )}
             </NavLink>
@@ -173,44 +165,79 @@ const AppLayout = () => {
         </div>
       </aside>
 
-      {/* ── Main ─────────────────────────────────────────────────────────── */}
+      {/* ── Main area ────────────────────────────────────────────────────── */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* Appbar */}
-        <header className="flex items-center justify-between h-16 px-6 bg-white border-b border-dark/[0.06] shrink-0">
-          <h1 className="font-display text-lg font-light text-dark">
-            {pageTitle}
-          </h1>
-
+        <header className="flex items-center justify-between h-14 md:h-16 px-4 md:px-6 bg-white border-b border-dark/[0.06] shrink-0">
+          {/* Mobile: logo | Desktop: page title */}
           <div className="flex items-center gap-3">
+            <span className="md:hidden font-display text-base font-light text-dark">
+              Cash<span className="text-primary">Pilot</span>
+            </span>
+            <h1 className="hidden md:block font-display text-lg font-light text-dark">
+              {pageTitle}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-3">
             {user?.company?.currency && (
-              <span className="font-mono text-[11px] text-neutral-text-muted bg-neutral-bg-soft border border-dark/8 px-2.5 py-1 rounded-md">
+              <span className="font-mono text-[10px] md:text-[11px] text-neutral-text-muted bg-neutral-bg-soft border border-dark/8 px-2 md:px-2.5 py-1 rounded-md">
                 {user.company.currency}
               </span>
             )}
-            <div className="flex items-center gap-2.5">
-              <div className="flex items-center justify-center size-8 rounded-full bg-primary shrink-0">
-                <span className="font-sans text-xs font-semibold text-white">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center size-7 md:size-8 rounded-full bg-primary shrink-0">
+                <span className="font-sans text-[10px] md:text-xs font-semibold text-white">
                   {user?.fullName ? initials(user.fullName) : '?'}
                 </span>
               </div>
               <div className="hidden sm:block leading-none">
-                <p className="font-sans text-xs font-medium text-dark">
-                  {user?.fullName ?? '—'}
-                </p>
-                <p className="font-sans text-[10px] text-neutral-text-muted mt-0.5">
-                  {user?.company?.name ?? '—'}
-                </p>
+                <p className="font-sans text-xs font-medium text-dark">{user?.fullName ?? '—'}</p>
+                <p className="font-sans text-[10px] text-neutral-text-muted mt-0.5">{user?.company?.name ?? '—'}</p>
               </div>
             </div>
+            {/* Mobile logout */}
+            <button
+              onClick={clearAuth}
+              title="Sign out"
+              className="md:hidden text-neutral-text-muted hover:text-red-400 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+              </svg>
+            </button>
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        {/* Page content — extra bottom padding on mobile for the tab bar */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6">
           <Outlet />
         </main>
       </div>
+
+      {/* ── Bottom tab bar — mobile only ─────────────────────────────────── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark border-t border-white/5 flex items-center">
+        {NAV.map(({ label, path, exact, icon }) => (
+          <NavLink
+            key={path}
+            to={path}
+            end={exact}
+            className="flex-1"
+          >
+            {({ isActive }) => (
+              <div className={[
+                'flex flex-col items-center justify-center gap-1 py-2.5 transition-colors duration-150',
+                isActive ? 'text-primary' : 'text-white/30',
+              ].join(' ')}>
+                {icon}
+                <span className="font-sans text-[9px] font-medium">{label}</span>
+                {isActive && <span className="size-1 rounded-full bg-primary" />}
+              </div>
+            )}
+          </NavLink>
+        ))}
+      </nav>
 
     </div>
   );
