@@ -53,7 +53,7 @@ jobs:
 
       # - name: Test
       #   working-directory: client
-      #   run: npm run test --if-present
+      ##   run: npm run test --if-present
 
       - name: Build
         working-directory: client
