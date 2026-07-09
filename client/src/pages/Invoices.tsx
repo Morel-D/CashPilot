@@ -13,14 +13,14 @@ import type { InvoiceStatus } from '../modules/invoice/Invoicetypes';
 const PAGE_SIZE = 10;
 
 const STATUS_FILTERS: { value: InvoiceStatus | null; label: string }[] = [
-  { value: null,           label: 'All'       },
-  { value: 'DRAFT',        label: 'Draft'     },
-  { value: 'ISSUED',       label: 'Issued'    },
-  { value: 'SENT',         label: 'Sent'      },
-  { value: 'PARTIALLY_PAID', label: 'Partial' },
-  { value: 'PAID',         label: 'Paid'      },
-  { value: 'OVERDUE',      label: 'Overdue'   },
-  { value: 'CANCELLED',    label: 'Cancelled' },
+  { value: null,             label: 'All'       },
+  { value: 'DRAFT',          label: 'Draft'     },
+  { value: 'ISSUED',         label: 'Issued'    },
+  { value: 'SENT',           label: 'Sent'      },
+  { value: 'PARTIALLY_PAID', label: 'Partial'   },
+  { value: 'PAID',           label: 'Paid'      },
+  { value: 'OVERDUE',        label: 'Overdue'   },
+  { value: 'CANCELLED',      label: 'Cancelled' },
 ];
 
 export default function InvoicesPage() {
@@ -83,32 +83,33 @@ export default function InvoicesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 md:gap-6">
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-light text-dark">Invoices</h2>
-          <p className="font-sans text-sm text-neutral-text-muted mt-0.5">
+          <h2 className="font-display text-xl md:text-2xl font-light text-dark">Invoices</h2>
+          <p className="font-sans text-xs md:text-sm text-neutral-text-muted mt-0.5">
             {page ? `${page.totalElements} invoice${page.totalElements !== 1 ? 's' : ''}` : 'Manage your invoices.'}
           </p>
         </div>
-        <Button variant="primary" size="md" onClick={() => openModal('create')}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+        <Button variant="primary" size="sm" onClick={() => openModal('create')}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-3.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          New invoice
+          <span className="hidden sm:inline">New invoice</span>
+          <span className="sm:hidden">New</span>
         </Button>
       </div>
 
-      {/* Status filter tabs */}
-      <div className="flex items-center gap-1.5 flex-wrap">
+      {/* Status filter — scrollable on mobile */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
         {STATUS_FILTERS.map(({ value, label }) => (
           <button
             key={String(value)}
             onClick={() => handleFilterChange(value)}
             className={[
-              'font-sans text-xs font-medium px-3 py-1.5 rounded-lg border transition-all duration-150',
+              'font-sans text-xs font-medium px-3 py-1.5 rounded-lg border transition-all duration-150 whitespace-nowrap shrink-0',
               statusFilter === value
                 ? 'bg-dark text-white border-dark'
                 : 'bg-white text-neutral-text-muted border-dark/10 hover:text-dark hover:border-dark/20',
@@ -123,9 +124,9 @@ export default function InvoicesPage() {
       {loading && !page ? (
         <div className="flex justify-center py-20"><Loader /></div>
       ) : !page || page.content.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center py-20 gap-4 text-center">
-          <div className="flex items-center justify-center size-14 rounded-2xl bg-primary/8 text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.25} stroke="currentColor" className="size-7">
+        <div className="card flex flex-col items-center justify-center py-16 gap-4 text-center">
+          <div className="flex items-center justify-center size-12 rounded-2xl bg-primary/8 text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.25} stroke="currentColor" className="size-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
             </svg>
           </div>
@@ -154,29 +155,26 @@ export default function InvoicesPage() {
           onView={(i)   => openModal('view', i)}
           onEdit={(i)   => openModal('edit', i)}
           onDelete={(i) => openModal('delete', i)}
-          onPage={(p)   => setCurrentPage(p)}
+          onPage={setCurrentPage}
         />
       )}
 
-      {/* ── Modals ─────────────────────────────────────────────────────────── */}
-
+      {/* Modals */}
       {modal === 'create' && (
         <Modal title="New invoice" onClose={closeModal} size="lg">
           <InvoiceForm mode="create" loading={actionLoading} onSubmit={handleCreate} onCancel={closeModal} />
         </Modal>
       )}
-
       {modal === 'edit' && selected && (
         <Modal title="Edit invoice" onClose={closeModal} size="lg">
           <InvoiceForm mode="edit" initial={selected} loading={actionLoading} onSubmit={handleEdit} onCancel={closeModal} />
         </Modal>
       )}
-
       {modal === 'view' && selected && (
         <Modal title="Invoice details" onClose={closeModal} size="lg">
           <InvoiceView
             invoice={selected}
-            onEdit={()    => openModal('edit', selected)}
+            onEdit={()   => openModal('edit', selected)}
             onDelete={()  => openModal('delete', selected)}
             onClose={closeModal}
             onIssue={issueInvoice}
@@ -186,18 +184,11 @@ export default function InvoicesPage() {
           />
         </Modal>
       )}
-
       {modal === 'pay' && selected && (
         <Modal title="Record payment" onClose={closeModal} size="md">
-          <InvoicePayForm
-            invoice={selected}
-            loading={actionLoading}
-            onSubmit={handlePay}
-            onCancel={closeModal}
-          />
+          <InvoicePayForm invoice={selected} loading={actionLoading} onSubmit={handlePay} onCancel={closeModal} />
         </Modal>
       )}
-
       {modal === 'delete' && selected && (
         <Modal title="Delete invoice" onClose={closeModal} size="sm">
           <CustomerDeleteConfirm
