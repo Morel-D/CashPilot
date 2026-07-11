@@ -85,7 +85,7 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     const correlationId = extractCorrelationId(response.data);
     if (correlationId) {
-      (response as any)._correlationId = correlationId;
+      (response as AxiosResponse & { _correlationId?: string })._correlationId = correlationId;
     }
     return response;
   },

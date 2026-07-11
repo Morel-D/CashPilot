@@ -252,6 +252,8 @@ CashPilot's live environment is split across four managed platforms instead of t
 
 ---
 
+<!-- CI test trigger -->
+
 ## Roadmap
 
 - [ ] Role-based access control (RBAC)

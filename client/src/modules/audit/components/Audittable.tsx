@@ -16,6 +16,12 @@ function formatDate(iso: string) {
   });
 }
 
+function formatDateShort(iso: string) {
+  return new Date(iso).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+  });
+}
+
 export function AuditTable({ page, onSelect, onPage }: AuditTableProps) {
   const { content, number, totalPages, totalElements, size } = page;
   const from = number * size + 1;
@@ -23,7 +29,39 @@ export function AuditTable({ page, onSelect, onPage }: AuditTableProps) {
 
   return (
     <div className="card p-0 overflow-hidden flex flex-col">
-      <div className="overflow-x-auto">
+
+      {/* ── Mobile: card list ─────────────────────────────────────────────── */}
+      <div className="md:hidden divide-y divide-dark/[0.04]">
+        {content.map((log) => (
+          <div
+            key={log.id}
+            onClick={() => onSelect(log)}
+            className="flex items-start justify-between px-4 py-3 hover:bg-neutral-bg-soft transition-colors cursor-pointer gap-3"
+          >
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <AuditActionBadge action={log.action} />
+                <span className="font-sans text-xs font-medium text-dark shrink-0">{log.entityType}</span>
+                {log.entityId && (
+                  <span className="font-mono text-[10px] text-neutral-text-muted">#{log.entityId}</span>
+                )}
+              </div>
+              <p className="font-sans text-xs text-neutral-text-muted truncate">
+                {log.description ?? '—'}
+              </p>
+            </div>
+            <div className="text-right shrink-0">
+              <p className="font-sans text-xs font-medium text-dark">{log.username}</p>
+              <p className="font-mono text-[10px] text-neutral-text-muted mt-0.5">
+                {formatDateShort(log.timestamp)}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Desktop: full table ───────────────────────────────────────────── */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-dark/[0.06]">
@@ -41,9 +79,7 @@ export function AuditTable({ page, onSelect, onPage }: AuditTableProps) {
                 className="group hover:bg-neutral-bg-soft transition-colors cursor-pointer"
                 onClick={() => onSelect(log)}
               >
-                <td className="px-4 py-3">
-                  <AuditActionBadge action={log.action} />
-                </td>
+                <td className="px-4 py-3"><AuditActionBadge action={log.action} /></td>
                 <td className="px-4 py-3">
                   <p className="font-sans text-xs font-medium text-dark">{log.entityType}</p>
                   {log.entityId && (
@@ -56,10 +92,8 @@ export function AuditTable({ page, onSelect, onPage }: AuditTableProps) {
                     <p className="font-mono text-[10px] text-neutral-text-muted">{log.ipAddress}</p>
                   )}
                 </td>
-                <td className="px-4 py-3 max-w-55">
-                  <p className="font-sans text-xs text-neutral-text-muted truncate">
-                    {log.description ?? '—'}
-                  </p>
+                <td className="px-4 py-3 max-w-[220px]">
+                  <p className="font-sans text-xs text-neutral-text-muted truncate">{log.description ?? '—'}</p>
                 </td>
                 <td className="px-4 py-3 font-mono text-[11px] text-neutral-text-muted whitespace-nowrap">
                   {formatDate(log.timestamp)}
@@ -77,9 +111,7 @@ export function AuditTable({ page, onSelect, onPage }: AuditTableProps) {
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-4 py-3 border-t border-dark/[0.06]">
-        <span className="font-sans text-xs text-neutral-text-muted">
-          {from}–{to} of {totalElements} entries
-        </span>
+        <span className="font-sans text-xs text-neutral-text-muted">{from}–{to} of {totalElements}</span>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="sm" disabled={number === 0} onClick={() => onPage(number - 1)}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-3.5">
