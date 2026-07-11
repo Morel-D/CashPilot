@@ -7,10 +7,24 @@ on:
     branches: [main]
 
 jobs:
-  # BUILD + TEST (backend) ----------
+  # ---------- BUILD + TEST (backend) ----------
   backend-build-test:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: cashpilot
+          POSTGRES_PASSWORD: cashpilot
+          POSTGRES_DB: cashpilot
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U cashpilot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - uses: actions/checkout@v4
 
@@ -27,9 +41,13 @@ jobs:
 
       - name: Test
         working-directory: server
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/cashpilot
+          SPRING_DATASOURCE_USERNAME: cashpilot
+          SPRING_DATASOURCE_PASSWORD: cashpilot
         run: ./mvnw -B -ntp test
 
-  # BUILD + TEST (frontend) ----------
+  # ---------- BUILD + TEST (frontend) ----------
   frontend-build-test:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -51,9 +69,9 @@ jobs:
         working-directory: client
         run: npm run lint --if-present
 
-      # - name: Test
-      #   working-directory: client
-      ##   run: npm run test --if-present
+      - name: Test
+        working-directory: client
+        run: npm run test --if-present
 
       - name: Build
         working-directory: client
