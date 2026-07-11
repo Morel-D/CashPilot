@@ -55,18 +55,23 @@ export function InvoiceForm({ initial, onSubmit, onCancel, loading, mode }: Invo
     customerId:  initial?.customer?.id ?? null,
   });
   const [errors,    setErrors]    = useState<InvoiceFormErrors>({});
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [customers, setCustomers] = useState<Customer[] | null>([]);
 
-  // Fetch customers for select box
-  useEffect(() => {
-    if (source !== 'customer') return;
-    setLoadingCustomers(true);
-    customerApi.getAll({ size: 100 })
-      .then((res) => { if (res.data.success && res.data.data) setCustomers(res.data.data.content); })
-      .catch(() => {})
-      .finally(() => setLoadingCustomers(false));
-  }, [source]);
+useEffect(() => {
+  if (source !== 'customer') return;
+  let cancelled = false;
+
+  customerApi.getAll({ size: 100 })
+    .then((res) => {
+      if (cancelled) return;
+      if (res.data.success && res.data.data) setCustomers(res.data.data.content);
+    })
+    .catch(() => { if (!cancelled) setCustomers([]); });
+
+  return () => { cancelled = true; };
+}, [source]);
+
+const loadingCustomers = source === 'customer' && customers === null;
 
   function onChange(field: keyof CreateInvoiceRequest) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -93,7 +98,7 @@ export function InvoiceForm({ initial, onSubmit, onCancel, loading, mode }: Invo
     await onSubmit(payload);
   }
 
-  const customerOptions = customers.map((c) => ({ value: String(c.id), label: c.name }));
+  const customerOptions = (customers ?? []).map((c) => ({ value: String(c.id), label: c.name }));
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">

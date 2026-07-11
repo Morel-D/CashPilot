@@ -27,6 +27,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
       })
       .catch(() => clearAuth())
       .finally(() => setChecking(false));
+    // Intentionally run once on mount only, to rehydrate the session from
+  // the in-memory token. Re-running on accessToken/user change would
+  // cause an infinite loop since setUser mutates `user` itself.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // No token at all → login

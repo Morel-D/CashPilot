@@ -146,6 +146,12 @@ public class CustomerService {
         dashboardService.invalidateCache();
     }
     
+    public Page<CustomerResponse> searchCustomers(String name, Pageable pageable) {
+        Long currentCompanyId = TenantContext.getCurrentCompanyId();
+        
+        Page<Customer> customers = customerRepository.searchByName(currentCompanyId, name, pageable);
+        return customers.map(this::mapToResponse);
+    }
     
     private CustomerResponse mapToResponse(Customer customer) {
         return new CustomerResponse(

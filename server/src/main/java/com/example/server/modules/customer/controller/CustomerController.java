@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.server.common.api.ApiResponse;
@@ -73,6 +74,18 @@ public class CustomerController {
         customerService.deleteCustomer(id);
         return ResponseEntity.ok(
             ApiResponse.success("Customer deleted successfully", "DONE")
+        );
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<CustomerResponse>>> searchCustomers(
+            @RequestParam String name, 
+            Pageable pageable) {
+        
+        Page<CustomerResponse> customers = customerService.searchCustomers(name, pageable);
+        
+        return ResponseEntity.ok(
+            ApiResponse.success(customers, "DONE")
         );
     }
 
