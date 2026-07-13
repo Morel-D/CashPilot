@@ -29,5 +29,14 @@ export const customerApi = {
 
   delete: (id: number) =>
     apiClient.delete<ApiResponse<null>>(`/api/customers/${id}`),
+
+  search: (name: string, params: CustomerPageParams = {}) =>
+    apiClient.get<CustomerPageResponse>('/api/customers/search', {
+      params: {
+        name,
+        page: params.page ?? 0,
+        size: params.size ?? 10,
+      },
+    }),
 };
 

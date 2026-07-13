@@ -325,6 +325,26 @@ public class InvoiceService {
     }
 
 
+    public Page<InvoiceResponse> searchInvoices(String query, Pageable pageable) {
+        Long companyId = TenantContext.getCurrentCompanyId();
+        
+        Page<Invoice> invoices = invoiceRepository.searchByTitleOrCustomer(
+                companyId, query, pageable);
+        
+        return invoices.map(this::mapToResponse);
+    }
+
+
+    public Page<InvoiceResponse> getInvoicesByStatus(InvoiceStatus status, Pageable pageable) {
+        Long companyId = TenantContext.getCurrentCompanyId();
+        
+        Page<Invoice> invoices = invoiceRepository.findByCompanyIdAndStatus(
+                companyId, status, pageable);
+        
+        return invoices.map(this::mapToResponse);
+    }
+
+
     private InvoiceResponse mapToResponse(Invoice invoice) {
 
         CustomerResponse customerResponse = null;

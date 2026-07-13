@@ -2,6 +2,8 @@ package com.example.server.modules.audit.service;
 
 import org.springframework.transaction.annotation.Propagation;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,6 +125,20 @@ public class AuditService {
                 .stream()
                 .limit(limit)
                 .toList();
+    }
+
+    public Page<AuditLog> getAuditLogs(
+            String action, 
+            String entity, 
+            LocalDate fromDate, 
+            LocalDate toDate, 
+            Pageable pageable) {
+
+        LocalDateTime start = (fromDate != null) ? fromDate.atStartOfDay() : LocalDate.now().atStartOfDay();
+        LocalDateTime end = (toDate != null) ? toDate.plusDays(1).atStartOfDay() : LocalDate.now().plusDays(1).atStartOfDay();
+
+        return auditLogRepository.findAuditLogs(
+                action, entity, start, end, pageable);
     }
 
 

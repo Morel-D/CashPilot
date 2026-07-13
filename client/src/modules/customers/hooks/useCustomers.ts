@@ -35,6 +35,30 @@ export function useCustomers() {
     }
   }, []);
 
+
+    // ── Search ─────────────────────────────────────────────────────────────────
+ 
+  const searchCustomers = useCallback(async (name: string, params: CustomerPageParams = {}): Promise<void> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res  = await customerApi.search(name, params);
+      const body = res.data;
+      if (body.success && body.data) {
+        setPage(body.data);
+      } else {
+        setError(body.message);
+        toastFromResponse({ success: false, message: body.message, timestamp: body.timestamp });
+      }
+    } catch (err: unknown) {
+      const e = err as Error & { correlationId?: string };
+      setError(e.message);
+      toastError(e.message, e.correlationId);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // ── Create ─────────────────────────────────────────────────────────────────
 
   const createCustomer = useCallback(async (data: CreateCustomerRequest): Promise<boolean> => {
@@ -100,6 +124,7 @@ export function useCustomers() {
     page, loading, error, selected, modal,
     // actions
     fetchCustomers,
+    searchCustomers,
     createCustomer,
     editCustomer,
     deleteCustomer,

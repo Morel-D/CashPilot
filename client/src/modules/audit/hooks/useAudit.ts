@@ -11,9 +11,9 @@ export function useAudit() {
     setPage, setLoading, setError, setSelected,
     setActionFilter, setEntityTypeFilter, setSearchQuery,
   } = useAuditStore();
-
+ 
   // ── List with filters ──────────────────────────────────────────────────────
-
+ 
   const fetchAuditLogs = useCallback(async (params: AuditPageParams = {}) => {
     setLoading(true);
     setError(null);
@@ -33,14 +33,21 @@ export function useAudit() {
       setLoading(false);
     }
   }, []);
-
+ 
   // ── Search ─────────────────────────────────────────────────────────────────
-
+ 
   const searchAuditLogs = useCallback(async (q: string, page = 0) => {
     setLoading(true);
     setError(null);
+    const { actionFilter, entityTypeFilter } = useAuditStore.getState();
     try {
-      const res  = await auditApi.search({ q, page, size: 25 });
+      const res  = await auditApi.search({
+        q,
+        page,
+        size:       25,
+        action:     actionFilter     ?? undefined,
+        entityType: entityTypeFilter ?? undefined,
+      });
       const body = res.data;
       if (body.success && body.data) {
         setPage(body.data);
@@ -55,9 +62,9 @@ export function useAudit() {
       setLoading(false);
     }
   }, []);
-
+ 
   // ── Detail ─────────────────────────────────────────────────────────────────
-
+ 
   const fetchAuditDetail = useCallback(async (id: number) => {
     try {
       const res  = await auditApi.getById(id);
@@ -70,19 +77,19 @@ export function useAudit() {
       toastError(e.message, e.correlationId);
     }
   }, []);
-
+ 
   function changeActionFilter(f: AuditAction | null) {
     setActionFilter(f);
   }
-
+ 
   function changeEntityTypeFilter(f: string | null) {
     setEntityTypeFilter(f);
   }
-
+ 
   function changeSearchQuery(q: string) {
     setSearchQuery(q);
   }
-
+ 
   return {
     // state
     page, loading, error, selected,

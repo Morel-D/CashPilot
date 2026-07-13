@@ -8,22 +8,25 @@ import type {
   PayInvoiceRequest,
   InvoicePageParams,
 } from '../Invoicetypes';
-
+ 
 export function useInvoices() {
   const {
-    page, loading, error, selected, modal, statusFilter,
+    page, loading, error, selected, modal, statusFilter, searchQuery,
     setPage, setLoading, setError,
-    setStatusFilter, openModal, closeModal,
+    setStatusFilter, setSearchQuery, openModal, closeModal,
     addInvoice, updateInvoice, removeInvoice,
   } = useInvoiceStore();
-
+ 
   // ── Fetch ──────────────────────────────────────────────────────────────────
-
+ 
   const fetchInvoices = useCallback(async (params: InvoicePageParams = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const res  = await invoiceApi.getAll(params);
+      // Route to the correct endpoint based on whether a status filter is active
+      const res = params.status
+        ? await invoiceApi.getByStatus(params.status, params)
+        : await invoiceApi.getAll(params);
       const body = res.data;
       if (body.success && body.data) {
         setPage(body.data);
@@ -39,9 +42,32 @@ export function useInvoices() {
       setLoading(false);
     }
   }, []);
-
+ 
+  // ── Search by title or customer name ───────────────────────────────────────
+ 
+  const searchInvoices = useCallback(async (query: string, params: InvoicePageParams = {}): Promise<void> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res  = await invoiceApi.search(query, params);
+      const body = res.data;
+      if (body.success && body.data) {
+        setPage(body.data);
+      } else {
+        setError(body.message);
+        toastFromResponse({ success: false, message: body.message, timestamp: body.timestamp });
+      }
+    } catch (err: unknown) {
+      const e = err as Error & { correlationId?: string };
+      setError(e.message);
+      toastError(e.message, e.correlationId);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+ 
   // ── Create ─────────────────────────────────────────────────────────────────
-
+ 
   const createInvoice = useCallback(async (data: CreateInvoiceRequest): Promise<boolean> => {
     try {
       const res  = await invoiceApi.create(data);
@@ -59,9 +85,9 @@ export function useInvoices() {
       return false;
     }
   }, []);
-
+ 
   // ── Edit ───────────────────────────────────────────────────────────────────
-
+ 
   const editInvoice = useCallback(async (id: number, data: UpdateInvoiceRequest): Promise<boolean> => {
     try {
       const res  = await invoiceApi.update(id, data);
@@ -79,9 +105,9 @@ export function useInvoices() {
       return false;
     }
   }, []);
-
+ 
   // ── Delete ─────────────────────────────────────────────────────────────────
-
+ 
   const deleteInvoice = useCallback(async (id: number): Promise<boolean> => {
     try {
       const res  = await invoiceApi.delete(id);
@@ -99,9 +125,9 @@ export function useInvoices() {
       return false;
     }
   }, []);
-
+ 
   // ── Issue (DRAFT → ISSUED) ─────────────────────────────────────────────────
-
+ 
   const issueInvoice = useCallback(async (id: number): Promise<boolean> => {
     try {
       const res  = await invoiceApi.issue(id);
@@ -115,9 +141,9 @@ export function useInvoices() {
       return false;
     }
   }, []);
-
+ 
   // ── Send (ISSUED → SENT) ───────────────────────────────────────────────────
-
+ 
   const sendInvoice = useCallback(async (id: number): Promise<boolean> => {
     try {
       const res  = await invoiceApi.send(id);
@@ -131,16 +157,14 @@ export function useInvoices() {
       return false;
     }
   }, []);
-
+ 
   // ── Pay ────────────────────────────────────────────────────────────────────
-
+ 
   const payInvoice = useCallback(async (
     id: number,
-    data: Pick<PayInvoiceRequest, 'paidAmount' | 'paymentMethod'>
+    data: PayInvoiceRequest
   ): Promise<boolean> => {
     try {
-      console.log("Pay Invoice id --> ", id);
-      console.log("Pay Invoice info --> ", data);
       const res  = await invoiceApi.pay(id, data);
       const body = res.data;
       toastFromResponse({ success: body.success, message: body.message, timestamp: body.timestamp });
@@ -156,9 +180,9 @@ export function useInvoices() {
       return false;
     }
   }, []);
-
+ 
   // ── Cancel ─────────────────────────────────────────────────────────────────
-
+ 
   const cancelInvoice = useCallback(async (id: number): Promise<boolean> => {
     try {
       const res  = await invoiceApi.cancel(id);
@@ -172,13 +196,14 @@ export function useInvoices() {
       return false;
     }
   }, []);
-
+ 
   return {
     // state
-    page, loading, error, selected, modal, statusFilter,
-    setStatusFilter,
+    page, loading, error, selected, modal, statusFilter, searchQuery,
+    setStatusFilter, setSearchQuery,
     // actions
     fetchInvoices,
+    searchInvoices,
     createInvoice,
     editInvoice,
     deleteInvoice,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCustomers } from '../modules/customers/hooks/useCustomers';
 import { CustomerTable } from '../modules/customers/components/Customertable';
 import { CustomerForm } from '../modules/customers/components/Customerform';
@@ -7,22 +7,40 @@ import { CustomerDeleteConfirm } from '../modules/customers/components/Customerd
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
 import { Loader } from '../components/ui/Loader';
+import { Input } from '../components/ui/Input';
 
 const PAGE_SIZE = 10;
 
 export default function CustomersPage() {
   const {
     page, loading, selected, modal,
-    fetchCustomers, createCustomer, editCustomer, deleteCustomer,
+    fetchCustomers, searchCustomers, createCustomer, editCustomer, deleteCustomer,
     openModal, closeModal,
   } = useCustomers();
 
   const [actionLoading, setActionLoading] = useState(false);
   const [currentPage,   setCurrentPage]   = useState(0);
+  const [searchInput,   setSearchInput]   = useState('');
+  const [searchQuery,   setSearchQuery]   = useState('');
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    fetchCustomers({ page: currentPage, size: PAGE_SIZE });
-  }, [currentPage]);
+    if (searchQuery) {
+      searchCustomers(searchQuery, { page: currentPage, size: PAGE_SIZE });
+    } else {
+      fetchCustomers({ page: currentPage, size: PAGE_SIZE });
+    }
+  }, [currentPage, searchQuery]);
+
+  function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    setSearchInput(val);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setSearchQuery(val);
+      setCurrentPage(0);
+    }, 400);
+  }
 
   async function handleCreate(data: Parameters<typeof createCustomer>[0]) {
     setActionLoading(true);
@@ -72,6 +90,20 @@ export default function CustomersPage() {
           <span className="hidden sm:inline">Add customer</span>
           <span className="sm:hidden">Add</span>
         </Button>
+      </div>
+
+      {/* Search */}
+      <div className="w-full sm:w-64">
+        <Input
+          placeholder="Search by name or email…"
+          value={searchInput}
+          onChange={handleSearchInput}
+          leftIcon={
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          }
+        />
       </div>
 
       {/* Content */}

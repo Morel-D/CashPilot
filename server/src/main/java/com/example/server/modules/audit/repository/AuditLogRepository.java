@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import com.example.server.common.enums.AuditAction;
 import com.example.server.modules.audit.model.AuditLog;
@@ -13,7 +12,6 @@ import com.example.server.modules.audit.model.AuditLog;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
     // Basic queries with multi-tenancy
@@ -51,5 +49,18 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
     // Count by action type
     long countByCompanyIdAndAction(String companyId, AuditAction action);
+
+
+    @Query("SELECT a FROM AuditLog a WHERE " +
+           "(:action IS NULL OR a.action = :action) AND " +
+           "(:entity IS NULL OR a.entityType = :entity) AND " +
+           "a.timestamp >= :start AND a.timestamp < :end " +
+           "ORDER BY a.timestamp DESC")
+    Page<AuditLog> findAuditLogs(
+            @Param("action") String action,
+            @Param("entity") String entity,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            Pageable pageable);
 
 }

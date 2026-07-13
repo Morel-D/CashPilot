@@ -3,51 +3,55 @@ import type { Invoice, InvoiceStatus } from '../Invoicetypes';
 import type { Page } from '../../../types/page';
 
 type ModalMode = 'create' | 'edit' | 'view' | 'delete' | 'pay' | null;
-
+ 
 interface InvoiceState {
   page:      Page<Invoice> | null;
   loading:   boolean;
   error:     string | null;
   selected:  Invoice | null;
   modal:     ModalMode;
-
-  // Active status filter
-  statusFilter: InvoiceStatus | null;
-
+ 
+  // Active filters
+  statusFilter:  InvoiceStatus | null;
+  searchQuery:   string;
+ 
   // Actions
   setPage:          (page: Page<Invoice>) => void;
   setLoading:       (v: boolean) => void;
   setError:         (e: string | null) => void;
   setSelected:      (i: Invoice | null) => void;
   setStatusFilter:  (s: InvoiceStatus | null) => void;
+  setSearchQuery:   (q: string) => void;
   openModal:        (mode: ModalMode, invoice?: Invoice) => void;
   closeModal:       () => void;
-
+ 
   // Optimistic updates
   addInvoice:       (i: Invoice) => void;
   updateInvoice:    (i: Invoice) => void;
   removeInvoice:    (id: number) => void;
 }
-
+ 
 export const useInvoiceStore = create<InvoiceState>()((set) => ({
   page:         null,
   loading:      false,
   error:        null,
   selected:     null,
   modal:        null,
-  statusFilter: null,
-
+  statusFilter:  null,
+  searchQuery:   '',
+ 
   setPage:         (page)         => set({ page }),
   setLoading:      (loading)      => set({ loading }),
   setError:        (error)        => set({ error }),
   setSelected:     (selected)     => set({ selected }),
   setStatusFilter: (statusFilter) => set({ statusFilter }),
-
+  setSearchQuery:  (searchQuery)  => set({ searchQuery }),
+ 
   openModal: (modal, invoice) =>
     set({ modal, selected: invoice ?? null }),
-
+ 
   closeModal: () => set({ modal: null, selected: null }),
-
+ 
   addInvoice: (i) =>
     set((s) => {
       if (!s.page) return {};
@@ -59,7 +63,7 @@ export const useInvoiceStore = create<InvoiceState>()((set) => ({
         },
       };
     }),
-
+ 
   updateInvoice: (i) =>
     set((s) => {
       if (!s.page) return {};
@@ -72,7 +76,7 @@ export const useInvoiceStore = create<InvoiceState>()((set) => ({
         selected: s.selected?.id === i.id ? i : s.selected,
       };
     }),
-
+ 
   removeInvoice: (id) =>
     set((s) => {
       if (!s.page) return {};

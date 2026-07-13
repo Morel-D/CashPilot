@@ -9,16 +9,16 @@ import type { AuditAction } from '../modules/audit/Audittypes';
 
 const PAGE_SIZE = 25;
 
-const ACTION_FILTERS: { value: AuditAction | null; label: string }[] = [
-  { value: null,          label: 'All actions'   },
-  { value: 'CREATE',      label: 'Create'        },
-  { value: 'UPDATE',      label: 'Update'        },
-  { value: 'DELETE',      label: 'Delete'        },
-  { value: 'LOGIN',       label: 'Login'         },
-  { value: 'LOGOUT',      label: 'Logout'        },
-  { value: 'STATUS_CHANGE', label: 'Status change' },
-  { value: 'PAYMENT',     label: 'Payment'       },
-];
+// const ACTION_FILTERS: { value: AuditAction | null; label: string }[] = [
+//   { value: null,          label: 'All actions'   },
+//   { value: 'CREATE',      label: 'Create'        },
+//   { value: 'UPDATE',      label: 'Update'        },
+//   { value: 'DELETE',      label: 'Delete'        },
+//   { value: 'LOGIN',       label: 'Login'         },
+//   { value: 'LOGOUT',      label: 'Logout'        },
+//   { value: 'STATUS_CHANGE', label: 'Status change' },
+//   { value: 'PAYMENT',     label: 'Payment'       },
+// ];
 
 const ENTITY_FILTERS = [
   { value: null,        label: 'All entities' },
@@ -116,7 +116,7 @@ export default function AuditLogPage() {
       <div className="flex flex-wrap gap-6">
 
         {/* Action filter */}
-        <div className="flex flex-col gap-2">
+        {/* <div className="flex flex-col gap-2">
           <span className="field-label">Action</span>
           <div className="flex flex-wrap gap-1.5">
             {ACTION_FILTERS.map(({ value, label }) => (
@@ -134,7 +134,7 @@ export default function AuditLogPage() {
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Entity filter */}
         <div className="flex flex-col gap-2">

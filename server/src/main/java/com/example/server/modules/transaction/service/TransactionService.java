@@ -3,6 +3,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.server.common.enums.LedgerEntryType;
 import com.example.server.modules.ledger.model.LedgerEntry;
 import com.example.server.modules.ledger.repository.LedgerEntryRepository;
 import com.example.server.modules.tenant.TenantContext;
@@ -23,6 +24,21 @@ public class TransactionService {
         return ledgerEntries.map(this::mapToResponse);
     }
 
+    public Page<TransactionResponse> getTransactionsByType(String type, Pageable pageable) {
+        Long companyId = TenantContext.getCurrentCompanyId();
+        
+        LedgerEntryType ledgerType;
+        try {
+            ledgerType = LedgerEntryType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("INVALID_LEDGER_TYPE");
+        }
+
+        Page<LedgerEntry> entries = ledgerEntryRepository.findByCompanyIdAndType(
+                companyId, ledgerType, pageable);
+
+        return entries.map(this::mapToResponse);
+    }
 
     private TransactionResponse mapToResponse(LedgerEntry entry) {
         return new TransactionResponse(

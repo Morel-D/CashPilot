@@ -4,7 +4,7 @@ import { Select } from '../../../components/ui/Select';
 import { Button } from '../../../components/ui/Button';
 import { InvoiceStatusBadge } from './Invoicestatusbadge';
 import { validatePayInvoice, type PayFormErrors } from '../utils/Invoicevalidation';
-import type { Invoice } from '../Invoicetypes';
+import type { Invoice, PayInvoiceRequest } from '../Invoicetypes';
 import { useAuthStore } from '../../auth/store/authStore';
 
 const PAYMENT_METHODS = [
@@ -18,7 +18,7 @@ const PAYMENT_METHODS = [
 
 interface InvoicePayFormProps {
   invoice:   Invoice;
-  onSubmit:  (paidAmount: number, paymentMethod: string) => Promise<boolean>;
+  onSubmit:  (data: PayInvoiceRequest) => Promise<boolean>;
   onCancel:  () => void;
   loading:   boolean;
 }
@@ -42,7 +42,10 @@ export function InvoicePayForm({ invoice, onSubmit, onCancel, loading }: Invoice
     e.preventDefault();
     const errs = validatePayInvoice(form);
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    await onSubmit(form.paidAmount, form.paymentMethod);
+    await onSubmit({
+      paidAmount: form.paidAmount, paymentMethod: form.paymentMethod,
+      invoiceId: 0
+    });
   }
 
   return (

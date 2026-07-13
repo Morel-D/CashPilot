@@ -14,10 +14,26 @@ export const invoiceApi = {
   getAll: (params: InvoicePageParams = {}) =>
     apiClient.get<InvoicePageResponse>('/api/invoices', {
       params: {
-        page:   params.page   ?? 0,
-        size:   params.size   ?? 10,
-        ...(params.sort   ? { sort:   params.sort   } : {}),
-        ...(params.status ? { status: params.status } : {}),
+        page: params.page ?? 0,
+        size: params.size ?? 10,
+        ...(params.sort ? { sort: params.sort } : {}),
+      },
+    }),
+ 
+  getByStatus: (status: string, params: InvoicePageParams = {}) =>
+    apiClient.get<InvoicePageResponse>(`/api/invoices/status/${status}`, {
+      params: {
+        page: params.page ?? 0,
+        size: params.size ?? 10,
+      },
+    }),
+ 
+  search: (query: string, params: InvoicePageParams = {}) =>
+    apiClient.get<InvoicePageResponse>('/api/invoices/search', {
+      params: {
+        query,
+        page: params.page ?? 0,
+        size: params.size ?? 10,
       },
     }),
  
@@ -36,22 +52,15 @@ export const invoiceApi = {
   // ── Status transitions ────────────────────────────────────────────────────
  
   issue: (id: number) =>
-    apiClient.post<InvoiceResponse>(`/api/invoices/${id}/issue`, {
-      id: id
-    }),
+    apiClient.get<InvoiceResponse>(`/api/invoices/${id}/issue`),
  
   send: (id: number) =>
-    apiClient.post<InvoiceResponse>(`/api/invoices/${id}/send`, {
-      id: id
-    }),
+    apiClient.get<InvoiceResponse>(`/api/invoices/${id}/send`),
  
-  pay: (id: number, body: Omit<PayInvoiceRequest, 'invoiceId'>) =>
-    apiClient.post<InvoiceResponse>(`/api/invoices/${id}/pay`, {
-      invoiceId:     id,
-      paidAmount:    body.paidAmount,
-      paymentMethod: body.paymentMethod,
-    } satisfies PayInvoiceRequest),
+  pay: (id: number, body: PayInvoiceRequest) =>
+    apiClient.post<InvoiceResponse>(`/api/invoices/${id}/pay`, body),
  
   cancel: (id: number) =>
     apiClient.post<InvoiceResponse>(`/api/invoices/${id}/cancel`, {}),
 };
+ 

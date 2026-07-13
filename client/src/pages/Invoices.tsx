@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useInvoices } from '../modules/invoice/hooks/useInvoices';
 import { InvoiceTable } from '../modules/invoice/components/Invoicetable';
 import { InvoiceForm } from '../modules/invoice/components/Invoiceform';
@@ -8,7 +8,8 @@ import { CustomerDeleteConfirm } from '../modules/customers/components/Customerd
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
 import { Loader } from '../components/ui/Loader';
-import type { InvoiceStatus } from '../modules/invoice/Invoicetypes';
+import { Input } from '../components/ui/Input';
+import type { InvoiceStatus, PayInvoiceRequest } from '../modules/invoice/Invoicetypes';
 
 const PAGE_SIZE = 10;
 
@@ -25,25 +26,44 @@ const STATUS_FILTERS: { value: InvoiceStatus | null; label: string }[] = [
 
 export default function InvoicesPage() {
   const {
-    page, loading, selected, modal, statusFilter,
-    setStatusFilter,
-    fetchInvoices, createInvoice, editInvoice, deleteInvoice,
+    page, loading, selected, modal, statusFilter, searchQuery,
+    setStatusFilter, setSearchQuery,
+    fetchInvoices, searchInvoices, createInvoice, editInvoice, deleteInvoice,
     issueInvoice, sendInvoice, payInvoice, cancelInvoice,
     openModal, closeModal,
   } = useInvoices();
 
   const [actionLoading, setActionLoading] = useState(false);
   const [currentPage,   setCurrentPage]   = useState(0);
+  const [searchInput,   setSearchInput]   = useState('');
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function load(p = currentPage, status = statusFilter) {
-    fetchInvoices({ page: p, size: PAGE_SIZE, ...(status ? { status } : {}) });
+    if (searchQuery) {
+      searchInvoices(searchQuery, { page: p, size: PAGE_SIZE });
+    } else {
+      fetchInvoices({ page: p, size: PAGE_SIZE, ...(status ? { status } : {}) });
+    }
   }
 
-  useEffect(() => { load(); }, [currentPage, statusFilter]);
+  useEffect(() => { load(); }, [currentPage, statusFilter, searchQuery]);
 
   function handleFilterChange(status: InvoiceStatus | null) {
     setStatusFilter(status);
+    setSearchQuery('');
+    setSearchInput('');
     setCurrentPage(0);
+  }
+
+  function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    setSearchInput(val);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setSearchQuery(val);
+      setStatusFilter(null); // clear status filter when searching
+      setCurrentPage(0);
+    }, 400);
   }
 
   async function handleCreate(data: Parameters<typeof createInvoice>[0]) {
@@ -74,10 +94,10 @@ export default function InvoicesPage() {
     }
   }
 
-  async function handlePay(paidAmount: number, paymentMethod: string) {
+  async function handlePay(paid: PayInvoiceRequest) {
     if (!selected) return false;
     setActionLoading(true);
-    const ok = await payInvoice(selected.id, { paidAmount, paymentMethod });
+    const ok = await payInvoice(selected.id, paid);
     setActionLoading(false);
     return ok;
   }
@@ -100,6 +120,20 @@ export default function InvoicesPage() {
           <span className="hidden sm:inline">New invoice</span>
           <span className="sm:hidden">New</span>
         </Button>
+      </div>
+
+      {/* Search */}
+      <div className="w-full sm:w-64">
+        <Input
+          placeholder="Search by title or customer…"
+          value={searchInput}
+          onChange={handleSearchInput}
+          leftIcon={
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          }
+        />
       </div>
 
       {/* Status filter — scrollable on mobile */}

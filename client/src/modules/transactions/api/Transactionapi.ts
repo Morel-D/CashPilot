@@ -12,4 +12,13 @@ export const transactionApi = {
         ...(params.status ? { status: params.status } : {}),
       },
     }),
+
+  getByType: (type: string, params: TransactionPageParams = {}) =>
+    apiClient.get<TransactionPageResponse>(`/api/transactions/type/${type}`, {
+      params: {
+        page: params.page ?? 0,
+        size: params.size ?? 20,
+        ...(params.sort   ? { sort: params.sort } : {}),
+      },
+    }),
 };

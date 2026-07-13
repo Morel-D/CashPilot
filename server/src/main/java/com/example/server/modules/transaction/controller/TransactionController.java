@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +25,18 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<TransactionResponse>>> getAllTransactions(Pageable pageable) {
         Page<TransactionResponse> transactions = transactionService.getAllTransactions(pageable);
+        
+        return ResponseEntity.ok(
+            ApiResponse.success(transactions, "DONE")
+        );
+    }
+
+    @GetMapping("/type/{type}")
+    public ResponseEntity<ApiResponse<Page<TransactionResponse>>> getTransactionsByType(
+            @PathVariable String type, 
+            Pageable pageable) {
+        
+        Page<TransactionResponse> transactions = transactionService.getTransactionsByType(type, pageable);
         
         return ResponseEntity.ok(
             ApiResponse.success(transactions, "DONE")

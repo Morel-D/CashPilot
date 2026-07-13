@@ -3,13 +3,7 @@
 ## Overview
 CashPilot is a modern treasury and cash management platform designed to help businesses track, control, and optimize their cash flow through invoices, payments, and financial records.
 
-**Current Status**: In active development (MVP Phase)
-
 ---
-
-## Current Progress (as of July 6, 2026)
-
-### ✅ Completed
 
 **Backend**
 - Project Structure: Feature-based modular architecture
@@ -23,13 +17,14 @@ CashPilot is a modern treasury and cash management platform designed to help bus
 - API Design: Consistent `ApiResponse<T>` wrapper + Global Exception Handler
 - Redis Integration: Caching with Cache Aside Pattern, TTL, and manual invalidation
 - Background Jobs: Scheduled tasks (e.g. overdue invoice detection)
+- Audit Logging: Full activity tracking with filters (Action, Entity, Period)
 - Modules Completed:
   - **Auth**: User + Company creation during registration
-  - **Customer**: Full CRUD
-  - **Invoice**: CRUD + State Transitions (DRAFT → ISSUED → SENT → PAID, etc.)
+  - **Customer**: Full CRUD + Search by name/email
+  - **Invoice**: CRUD + State Transitions (DRAFT → ISSUED → SENT → PAID, etc.) + Search/Filter
   - **Payment**: Triggered from Invoice pay endpoint with full orchestration
   - **Ledger**: Automatic entry on payment (CREDIT/DEBIT logic)
-  - **Transaction Listing**: Full history view
+  - **Transaction Listing**: Full history view with type filter (CREDIT/DEBIT)
   - **Dashboard**: Metrics cards (Revenue Today, Outstanding, Overdue, Total Customers) + Recent Transactions + Pending Invoices
 
 **Frontend**
@@ -44,6 +39,7 @@ CashPilot is a modern treasury and cash management platform designed to help bus
   - **Customer**: Full CRUD with paginated table and modal-based forms
   - **Invoice**: Full lifecycle UI: create, edit, view, delete, plus status-aware actions (Issue, Send, Pay, Cancel) with guarded availability per status
   - **Transactions**: Read-only paginated ledger view with type/status filtering and detail modal
+  - **Dashboard**: Metrics cards + Recent Transactions + Pending Invoices
 
 **DevOps**
 - Docker Setup:
@@ -53,6 +49,7 @@ CashPilot is a modern treasury and cash management platform designed to help bus
   - Custom `nginx.conf` for SPA client-side routing, gzip compression, and static asset caching
   - Shared Docker network (`cashpilot-network`) for inter-service communication
   - Environment-driven configuration via root `.env` (DB credentials, frontend API base URL injected at build time)
+- CI/CD: GitHub Actions for frontend, backend, and Docker builds
 - Live Deployment:
   - Client on Vercel, Server on Render (Docker), Database on Neon, Redis on Upstash
 
@@ -61,18 +58,19 @@ CashPilot is a modern treasury and cash management platform designed to help bus
 ## Tech Stack
 
 | Layer            | Technology                                             |
-|-------------------|----------------------------------------------------------|
+|------------------|----------------------------------------------------------|
 | Backend          | Java 21, Spring Boot 3, Spring Security, JWT, Redis      |
 | Database         | PostgreSQL, Flyway                                         |
 | Frontend         | React 18, TypeScript, Vite, Tailwind CSS v4, Zustand       |
 | Background Jobs  | Spring @Scheduled                                          |
 | Containerization | Docker, Docker Compose                                     |
-| Web Server       | Nginx (frontend static serving, local Docker only)          |
-| Build Tools      | Maven (backend), npm (frontend)                            |
+| Web Server       | Nginx (frontend static serving)                            |
+| CI/CD            | GitHub Actions                                             |
 
 ---
 
 ## Project Structure
+
 
 ```
 cashpilot/

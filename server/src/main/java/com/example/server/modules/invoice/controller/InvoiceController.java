@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.server.common.api.ApiResponse;
+import com.example.server.common.enums.InvoiceStatus;
 import com.example.server.modules.invoice.dto.InvoiceRequest;
 import com.example.server.modules.invoice.dto.InvoiceResponse;
 import com.example.server.modules.invoice.service.InvoiceService;
@@ -91,17 +93,46 @@ public class InvoiceController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<InvoiceResponse>> updateInvoice(
-        @PathVariable Long id, 
-        @RequestBody InvoiceRequest request) {
-    
-    InvoiceResponse response = invoiceService.updateInvoice(id, request);
-    
-    return ResponseEntity.ok(
-        ApiResponse.success(response, "DONE")
-    );
-}
+        public ResponseEntity<ApiResponse<InvoiceResponse>> updateInvoice(
+            @PathVariable Long id, 
+            @RequestBody InvoiceRequest request) {
+        
+        InvoiceResponse response = invoiceService.updateInvoice(id, request);
+        
+        return ResponseEntity.ok(
+            ApiResponse.success(response, "DONE")
+        );
+    }
 
+    @GetMapping("/search")
+        public ResponseEntity<ApiResponse<Page<InvoiceResponse>>> searchInvoices(
+            @RequestParam String query, 
+            Pageable pageable) {
+        
+        Page<InvoiceResponse> invoices = invoiceService.searchInvoices(query, pageable);
+        return ResponseEntity.ok(
+            ApiResponse.success(invoices, "DONE")
+        );
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<ApiResponse<Page<InvoiceResponse>>> getInvoicesByStatus(
+            @PathVariable String status, 
+            Pageable pageable) {
+
+        InvoiceStatus invoiceStatus;
+    
+    try {
+        invoiceStatus = InvoiceStatus.valueOf(status.toUpperCase());
+    } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException("INVALID_INVOICE_STATUS");
+    }
+        
+        Page<InvoiceResponse> invoices = invoiceService.getInvoicesByStatus(invoiceStatus, pageable);
+        return ResponseEntity.ok(
+            ApiResponse.success(invoices, "DONE")
+        );
+    }
 
 
 }

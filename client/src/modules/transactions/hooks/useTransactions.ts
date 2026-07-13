@@ -9,12 +9,14 @@ export function useTransactions() {
     page, loading, error, selected, typeFilter,
     setPage, setLoading, setError, setSelected, setTypeFilter,
   } = useTransactionStore();
-
+ 
   const fetchTransactions = useCallback(async (params: TransactionPageParams = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const res  = await transactionApi.getAll(params);
+      const res = params.type
+        ? await transactionApi.getByType(params.type, params)
+        : await transactionApi.getAll(params);
       const body = res.data;
       if (body.success && body.data) {
         setPage(body.data);
@@ -29,16 +31,16 @@ export function useTransactions() {
       setLoading(false);
     }
   }, []);
-
+ 
   function selectTransaction(t: ReturnType<typeof useTransactionStore.getState>['selected']) {
     setSelected(t);
   }
-
+ 
   function changeTypeFilter(f: TransactionType | null) {
     setTypeFilter(f);
     setSelected(null);
   }
-
+ 
   return {
     page, loading, error, selected, typeFilter,
     fetchTransactions,

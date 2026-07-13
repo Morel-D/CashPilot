@@ -76,7 +76,7 @@ export function TransactionTable({ page, selected, onSelect, onPage }: Transacti
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-dark/[0.06]">
-              {['Type', 'Description', 'Customer', 'Invoice', 'Date', 'Status', 'Amount'].map((h) => (
+              {['Type', 'Description', 'Customer', 'Invoice', 'Date', 'Amount'].map((h) => (
                 <th key={h} className={[
                   'px-4 py-3 font-sans text-[11px] font-semibold uppercase tracking-wider text-neutral-text-muted whitespace-nowrap',
                   h === 'Amount' ? 'text-right' : '',
@@ -100,7 +100,7 @@ export function TransactionTable({ page, selected, onSelect, onPage }: Transacti
                   ].join(' ')}
                 >
                   <td className="px-4 py-3"><TransactionTypeBadge type={t.type} /></td>
-                  <td className="px-4 py-3 font-sans text-sm text-dark max-w-[200px] truncate">
+                  <td className="px-4 py-3 font-sans text-sm text-dark max-w-50 truncate">
                     {t.description ?? '—'}
                   </td>
                   <td className="px-4 py-3 font-sans text-sm text-neutral-text-muted">
@@ -111,11 +111,6 @@ export function TransactionTable({ page, selected, onSelect, onPage }: Transacti
                   </td>
                   <td className="px-4 py-3 font-sans text-xs text-neutral-text-muted whitespace-nowrap">
                     {formatDate(t.occurredAt)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="font-sans text-xs text-neutral-text-muted bg-neutral-bg-soft border border-dark/8 px-2 py-0.5 rounded-full">
-                      {t.status}
-                    </span>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className={`font-mono text-sm font-semibold ${isCredit ? 'text-emerald-600' : 'text-red-500'}`}>

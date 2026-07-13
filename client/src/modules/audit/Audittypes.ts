@@ -1,9 +1,8 @@
 import type { Page } from '../../types/page';
 import type { ApiResponse } from '../../utils/Axios';
 
-
 // ─── Known audit actions (extend as backend grows) ────────────────────────────
-
+ 
 export type AuditAction =
   | 'CREATE'
   | 'UPDATE'
@@ -14,9 +13,9 @@ export type AuditAction =
   | 'STATUS_CHANGE'
   | 'PAYMENT'
   | string; // open-ended fallback
-
+ 
 // ─── Entity ───────────────────────────────────────────────────────────────────
-
+ 
 export interface AuditLog {
   id:          number;
   companyId:   string;
@@ -32,25 +31,28 @@ export interface AuditLog {
   ipAddress:   string | null;
   userAgent:   string | null;
 }
-
+ 
 // ─── Query params ─────────────────────────────────────────────────────────────
-
+ 
 export interface AuditPageParams {
   page?:       number;
   size?:       number;
   sort?:       string;
   action?:     AuditAction;
-  entityType?: string;
-  username?:   string;
+  entityType?: string;   // maps to "entity" on getAll, "entityType" on search
+  fromDate?:   string;   // ISO date: YYYY-MM-DD
+  toDate?:     string;   // ISO date: YYYY-MM-DD
 }
-
+ 
 export interface AuditSearchParams {
-  q:     string;
-  page?: number;
-  size?: number;
+  q?:          string;   // maps to "search" param
+  action?:     AuditAction;
+  entityType?: string;
+  page?:       number;
+  size?:       number;
 }
-
+ 
 // ─── API responses ────────────────────────────────────────────────────────────
-
+ 
 export type AuditPageResponse   = ApiResponse<Page<AuditLog>>;
 export type AuditDetailResponse = ApiResponse<AuditLog>;
