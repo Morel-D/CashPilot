@@ -21,7 +21,8 @@ public class OverdueInvoiceJob {
     private final InvoiceRepository invoiceRepository;
     private final DashboardService dashboardService;
 
-    @Scheduled(cron = "0 0 2 * * *")  
+    @Scheduled(cron = "0 * * * * *")  
+    // @Scheduled(cron = "0 0 2 * * *")  
     @Transactional
     public void checkOverdueInvoices() {
         System.out.println("🔄 Starting overdue invoice check job...");

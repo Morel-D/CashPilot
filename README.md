@@ -5,6 +5,32 @@ CashPilot is a modern treasury and cash management platform designed to help bus
 
 ---
 
+---
+
+## Screenshots
+
+### Auth Overview
+![Auth - Login](assets/1.PNG)
+
+![Auth - Register](assets/2.PNG)
+
+### Dashbaord
+![Dashbaord](assets/3.PNG)
+
+### Customer Management
+![Customer List](assets/4.PNG)
+
+### Invoice Management
+![Invoice List](assets/5.PNG)
+
+### Transactions
+![Transactions List](assets/6.PNG)
+
+### Audit Trail
+![Audit Logs](assets/7.PNG)
+
+---
+
 **Backend**
 - Project Structure: Feature-based modular architecture
 - Domain Modeling: Core entities (`Company`, `Customer`, `Invoice`, `Payment`, `LedgerEntry`, `User`)
@@ -200,7 +226,7 @@ CashPilot's live environment is split across four managed platforms instead of t
 - Vercel builds `client/` directly — it does **not** use `client/Dockerfile` or `nginx.conf`; those are only relevant if the frontend is ever self-hosted as a container instead.
 - Set in **Vercel → Project → Settings → Environment Variables**:
   ```bash
-  VITE_API_BASE_URL=https://cashpilot-fx29.onrender.com
+  VITE_API_BASE_URL=https://cashpilot-2l6p.onrender.com
   ```
 - Because Vite bakes env vars into the build at build time, any change to `VITE_API_BASE_URL` requires a **redeploy**, not just a restart — same rule as local Docker.
 
@@ -228,7 +254,7 @@ CashPilot's live environment is split across four managed platforms instead of t
   ```
 - **Free tier idle spin-down**: Render's free tier spins the service down after ~15 minutes of inactivity, causing a slow first request afterward. An uptime bot (e.g. UptimeRobot) pinging a public health endpoint every 5 minutes keeps it warm:
   ```
-  https://cashpilot-fx29.onrender.com/actuator/health
+  https://cashpilot-2l6p.onrender.com/actuator/health
   ```
   This requires exposing Spring Boot Actuator's health endpoint and permitting it in `SecurityConfig`:
   ```properties
@@ -249,6 +275,10 @@ CashPilot's live environment is split across four managed platforms instead of t
 - Replaces the local Redis container. The compose setup connects to Redis via the Docker network hostname (`redis`); in production this must instead point to Upstash's public TLS endpoint via `REDIS_URL`, never a hardcoded local hostname.
 
 ---
+
+- **Free tier idle spin-down**: Render's free tier spins the service down after ~15 minutes of inactivity, causing a slow first request (~30–50s) afterward. Rather than working around this with a keepalive ping — which would just burn through the free-tier's monthly usage hours and risk violating the platform's fair-use terms — this is treated as a known, deliberate tradeoff of running on free infrastructure. The frontend surfaces a "waking up the server, this can take up to a minute" notice on cold start so it's transparent rather than looking like a bug.
+
+  See [Architecture Decisions](#architecture-decisions) for the full reasoning behind the free-tier setup.
 
 ## Roadmap
 
